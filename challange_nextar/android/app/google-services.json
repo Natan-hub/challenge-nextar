@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "493533336389",
+    "project_id": "loja-virtual-52474",
+    "storage_bucket": "loja-virtual-52474.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493533336389:android:9944b31dc2af8f113e642c",
+        "android_client_info": {
+          "package_name": "br.com.loss.lojavirtual"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOHv9jH37M86lqFYfQUYyGJ7L-L4qRm9E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493533336389:android:4c04f14ce2d43ec13e642c",
+        "android_client_info": {
+          "package_name": "com.example.challange_nextar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOHv9jH37M86lqFYfQUYyGJ7L-L4qRm9E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
