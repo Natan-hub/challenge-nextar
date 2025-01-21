@@ -1,3 +1,3 @@
 class Routes {
-  static const init = "init";
+  static const hiddenDrawer = "hiddenDrawer";
 }

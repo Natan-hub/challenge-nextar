@@ -1,3 +1,4 @@
+import 'package:challange_nextar/components/hidden_drawer_component.dart';
 import 'package:challange_nextar/routes/pages.dart';
 import 'package:flutter/material.dart';
 
@@ -6,9 +7,9 @@ class Pages {
     final routeName = settings.name;
 
     switch (routeName) {
-      case Routes.init:
+      case Routes.hiddenDrawer:
         return MaterialPageRoute(
-          builder: (context) => const Placeholder(),
+          builder: (context) => const HiddenDrawerComponent(),
         );
         
       default:

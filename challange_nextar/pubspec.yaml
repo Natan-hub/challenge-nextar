@@ -39,6 +39,12 @@ dependencies:
   firebase_auth: ^5.2.0
   firebase_storage: ^12.2.0
   cloud_firestore: ^5.4.0
+  hidden_drawer_menu: ^3.0.1
+  google_fonts: ^6.2.1
+  modal_bottom_sheet: ^3.0.0
+  flutter_svg: ^2.0.10+1
+  awesome_top_snackbar: ^0.0.3
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
