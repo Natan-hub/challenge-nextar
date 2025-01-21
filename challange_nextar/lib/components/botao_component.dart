@@ -5,9 +5,7 @@ class BotaoPadrao extends StatefulWidget {
   final Color cor;
   final Color? corOutlined;
   final Function()? onPressed;
-  final IconData? icone;
   final TextStyle? styleText;
-  final Color corIcone;
   final Size? minimumSize;
   final double fontsize;
   final Widget? child;
@@ -16,22 +14,21 @@ class BotaoPadrao extends StatefulWidget {
   final BorderRadiusGeometry borderRadius;
   final EdgeInsetsGeometry? padding;
 
-  const BotaoPadrao(
-      {super.key,
-      required this.nomeBotao,
-      required this.cor,
-      this.corOutlined,
-      this.minimumSize,
-      this.side,
-      this.borderRadius = BorderRadius.zero,
-      this.padding,
-      this.style,
-      this.child,
-      this.fontsize = 16,
-      required this.onPressed,
-      this.icone,
-      this.styleText,
-      this.corIcone = Colors.white});
+  const BotaoPadrao({
+    super.key,
+    required this.nomeBotao,
+    required this.cor,
+    this.corOutlined,
+    this.minimumSize,
+    this.side,
+    this.borderRadius = BorderRadius.zero,
+    this.padding,
+    this.style,
+    this.child,
+    this.fontsize = 16,
+    required this.onPressed,
+    this.styleText,
+  });
 
   @override
   State<BotaoPadrao> createState() => _BotaoPadraoState();
