@@ -1,6 +1,9 @@
+import 'package:challange_nextar/components/hidden_drawer_component.dart';
 import 'package:challange_nextar/routes/routes.dart';
 import 'package:challange_nextar/utils/colors.dart';
+import 'package:challange_nextar/viewmodels/account_viewmodel/login_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -8,11 +11,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Challenger Nextar',
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: Pages.generateRoute,
-         theme: ThemeData(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => LoginViewModel(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Challenger Nextar',
+        debugShowCheckedModeBanner: false,
+        onGenerateRoute: Pages.generateRoute,
+        home: const HiddenDrawerComponent(),
+        theme: ThemeData(
           useMaterial3: false,
           appBarTheme: const AppBarTheme(
             backgroundColor: AppColors.primary,
@@ -24,6 +34,7 @@ class MyApp extends StatelessWidget {
           ),
           dividerTheme: const DividerThemeData(color: Colors.black),
         ),
+      ),
     );
   }
 }
