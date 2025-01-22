@@ -55,7 +55,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
                         height: 50,
                       ),
                       Text(
-                        'Realize o login para acessar a loja',
+                        'Realize o login para acessar a loja.',
                         style: normalTextStyle(
                           AppColors.primary,
                         ),
@@ -103,7 +103,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       textInputAction: TextInputAction.done,
       prefixIcon: const Icon(
-        Icons.email,
+        Icons.lock_rounded,
         color: AppColors.primary,
       ),
       suffixIcon: IconButton(
@@ -111,6 +111,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
           viewModelLogin.isObscurePassword
               ? Icons.visibility_off
               : Icons.visibility,
+          color: Colors.grey,
         ),
         onPressed: viewModelLogin.obscurePassword,
       ),
@@ -131,8 +132,9 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          GestureDetector(
+          InkWell(
             onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               showCupertinoModalBottomSheet(
                 isDismissible: false,
                 enableDrag: false,
@@ -143,7 +145,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
             },
             child: Text(
               'Esqueceu a senha?',
-              style: normalTextStyle(
+              style: normalTextStyleDefault(
                 AppColors.primary,
               ),
             ),
@@ -166,7 +168,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
         InkWell(
           onTap: () {},
           child: Text(
-            "Crie uma.",
+            "Crie uma",
             style: normalTextStyleBold(
               AppColors.primary,
             ),

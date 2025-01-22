@@ -28,14 +28,22 @@ TextStyle drawerMenuSelectedStyle() {
 
 TextStyle normalTextStyle(Color color) {
   return GoogleFonts.dmSans(
-    fontSize: 17,
+    fontSize: 18,
+    color: color,
+  );
+}
+
+TextStyle normalTextStyleDefault(
+  Color color,
+) {
+  return GoogleFonts.dmSans(
+    fontSize: 14,
     color: color,
   );
 }
 
 TextStyle normalTextStyleBold(Color color) {
   return GoogleFonts.dmSans(
-    fontSize: 17,
     fontWeight: FontWeight.bold,
     color: color,
   );

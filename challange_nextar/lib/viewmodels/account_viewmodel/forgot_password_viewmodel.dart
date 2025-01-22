@@ -16,6 +16,8 @@ class ForgotPasswordViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await Future.delayed(const Duration(seconds: 2));
+      clearFields();
       Navigator.pop(context);
       FlushBarComponente.mostrar(
         context,
@@ -34,5 +36,10 @@ class ForgotPasswordViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  void clearFields() {
+    emailController.clear();
+    notifyListeners(); // Notifica a view para que os campos sejam atualizados
   }
 }

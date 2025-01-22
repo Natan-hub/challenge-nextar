@@ -14,10 +14,10 @@ class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({super.key});
 
   @override
-  State<ForgotPasswordView> createState() => FforgotPasswordStateView();
+  State<ForgotPasswordView> createState() => ForgotPasswordStateView();
 }
 
-class FforgotPasswordStateView extends State<ForgotPasswordView>
+class ForgotPasswordStateView extends State<ForgotPasswordView>
     with ValidacoesMixin {
   @override
   Widget build(BuildContext context) {
@@ -31,6 +31,7 @@ class FforgotPasswordStateView extends State<ForgotPasswordView>
         extendBodyBehindAppBar: true,
         appBar: const AppBarComponente(
           isTitulo: 'Recuperar senha',
+          isVoltar: true,
         ),
         body: Form(
           key: viewModelForgotPaswword.formKey,
@@ -64,7 +65,7 @@ class FforgotPasswordStateView extends State<ForgotPasswordView>
                 ),
                 _buildEmailField(viewModelForgotPaswword),
                 const SizedBox(
-                  height: 150,
+                  height: 25,
                 ),
                 _buildRecoverButton(viewModelForgotPaswword, context),
               ],
@@ -100,10 +101,9 @@ class FforgotPasswordStateView extends State<ForgotPasswordView>
       ForgotPasswordViewModel viewModelForgotPaswword, BuildContext context) {
     return BotaoPadrao(
       borderRadius: BorderRadius.circular(10),
-      nomeBotao:
-          viewModelForgotPaswword.isLoading ? 'Enviando...' : 'Recuperar senha',
+      nomeBotao: viewModelForgotPaswword.isLoading ? 'Enviando...' : 'Enviar',
       cor: AppColors.corBotao,
-      padding: const EdgeInsets.fromLTRB(105, 20, 105, 20),
+      padding: const EdgeInsets.fromLTRB(115, 20, 115, 20),
       onPressed: viewModelForgotPaswword.isLoading
           ? null
           : () {

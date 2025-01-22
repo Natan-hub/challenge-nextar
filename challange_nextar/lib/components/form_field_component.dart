@@ -87,6 +87,8 @@ class FormFieldComponent extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.0),
         borderSide: BorderSide(color: Colors.grey.shade400),
       ),
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8.0),
         borderSide: BorderSide(color: Colors.grey.shade400),

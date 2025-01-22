@@ -8,13 +8,14 @@ class AppBarComponente extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final double appBarHeight;
   final bool? isVoltar;
-
+  final Color? color;
   final List<Widget>? actions;
 
   const AppBarComponente({
     super.key,
     this.actions,
     this.leading,
+    this.color,
     required this.isTitulo,
     this.appBarHeight = 55,
     this.isVoltar,
@@ -36,8 +37,14 @@ class AppBarComponente extends StatelessWidget implements PreferredSizeWidget {
       ),
       titleTextStyle: titleStyle(),
       centerTitle: true,
-      title: Text(isTitulo),
+      title: Text(
+        isTitulo,
+        style: TextStyle(
+          color: color ?? Colors.black,
+        ),
+      ),
       automaticallyImplyLeading: false,
+      backgroundColor: Colors.transparent,
       elevation: 0,
       leading: isVoltar == true ? _buildLeading(context) : leading,
       actions: actions,
@@ -47,7 +54,7 @@ class AppBarComponente extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildLeading(context) {
     return IconButton(
         iconSize: 24,
-        color: Colors.white,
+        color: Colors.black,
         icon: const Icon(Icons.arrow_back_ios_new),
         onPressed: () {
           Navigator.pop(context, false);
