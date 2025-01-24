@@ -1,5 +1,6 @@
+import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/images.dart';
-import 'package:challange_nextar/viewmodels/account_viewmodel/login_viewmodel.dart';
+import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +46,7 @@ class BannerCard extends StatelessWidget {
       height: 150,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFDCF8E8),
+        color: Color.fromARGB(255, 255, 170, 255),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -74,7 +75,7 @@ class BannerCard extends StatelessWidget {
                   const Text(
                     'Escolha as melhores roupas para levar para sua casa.',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -83,8 +84,8 @@ class BannerCard extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),

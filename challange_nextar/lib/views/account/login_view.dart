@@ -5,7 +5,7 @@ import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/images.dart';
 import 'package:challange_nextar/utils/styles.dart';
 import 'package:challange_nextar/validators/validacoes_mixin.dart';
-import 'package:challange_nextar/viewmodels/account_viewmodel/login_viewmodel.dart';
+import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:challange_nextar/views/account/forgot_password_view.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';

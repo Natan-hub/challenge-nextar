@@ -1,6 +1,8 @@
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/styles.dart';
-import 'package:challange_nextar/views/base_view.dart';
+import 'package:challange_nextar/views/pages_drawer/client_view.dart';
+import 'package:challange_nextar/views/pages_drawer/home_view.dart';
+import 'package:challange_nextar/views/pages_drawer/product_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
 
@@ -21,12 +23,39 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
     _pages = [
       ScreenHiddenDrawer(
         ItemHiddenMenu(
-          name: 'Home',
+          name: 'Início',
           baseStyle: drawerMenuStyle(),
           selectedStyle: drawerMenuSelectedStyle(),
           colorLineSelected: AppColors.primary2,
         ),
         BaseView(),
+      ),
+      ScreenHiddenDrawer(
+        ItemHiddenMenu(
+          name: 'Produtos',
+          baseStyle: drawerMenuStyle(),
+          selectedStyle: drawerMenuSelectedStyle(),
+          colorLineSelected: AppColors.primary2,
+        ),
+        ProductView(),
+      ),
+      ScreenHiddenDrawer(
+        ItemHiddenMenu(
+          name: 'Clientes',
+          baseStyle: drawerMenuStyle(),
+          selectedStyle: drawerMenuSelectedStyle(),
+          colorLineSelected: AppColors.primary2,
+        ),
+        ClientView(),
+      ),
+      ScreenHiddenDrawer(
+        ItemHiddenMenu(
+          name: 'Pedidos',
+          baseStyle: drawerMenuStyle(),
+          selectedStyle: drawerMenuSelectedStyle(),
+          colorLineSelected: AppColors.primary2,
+        ),
+        Placeholder(),
       ),
       ScreenHiddenDrawer(
         ItemHiddenMenu(

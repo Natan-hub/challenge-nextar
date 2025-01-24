@@ -1,7 +1,9 @@
 import 'package:challange_nextar/routes/routes.dart';
 import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/viewmodels/account_viewmodel/forgot_password_viewmodel.dart';
-import 'package:challange_nextar/viewmodels/account_viewmodel/login_viewmodel.dart';
+import 'package:challange_nextar/viewmodels/forgot_password_viewmodel.dart';
+import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
+import 'package:challange_nextar/viewmodels/client_viewmodel.dart';
+import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:challange_nextar/views/account/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ForgotPasswordViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ClientViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ProductViewModel(),
         ),
       ],
       child: MaterialApp(
