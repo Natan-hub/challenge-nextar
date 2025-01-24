@@ -1,5 +1,7 @@
 import 'package:challange_nextar/components/hidden_drawer_component.dart';
+import 'package:challange_nextar/models/product_model.dart';
 import 'package:challange_nextar/routes/pages.dart';
+import 'package:challange_nextar/views/details_product.dart';
 import 'package:flutter/material.dart';
 
 class Pages {
@@ -11,7 +13,16 @@ class Pages {
         return MaterialPageRoute(
           builder: (context) => const HiddenDrawerComponent(),
         );
-        
+      case Routes.detailsProduct:
+        final Map<String, dynamic> arguments =
+            settings.arguments as Map<String, dynamic>;
+        final ProductModel product = arguments['product'];
+        return MaterialPageRoute(
+          builder: (context) => DetailsProduct(
+            product: product,
+          ),
+        );
+
       default:
         return MaterialPageRoute(
           builder: (context) => const Placeholder(),
