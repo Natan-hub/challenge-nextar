@@ -28,6 +28,15 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
         ),
         BaseView(),
       ),
+      ScreenHiddenDrawer(
+        ItemHiddenMenu(
+          name: 'Minha conta',
+          baseStyle: drawerMenuStyle(),
+          selectedStyle: drawerMenuSelectedStyle(),
+          colorLineSelected: AppColors.primary2,
+        ),
+        Placeholder(),
+      ),
     ];
   }
 
@@ -35,11 +44,13 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
   Widget build(BuildContext context) {
     return HiddenDrawerMenu(
       backgroundColorMenu: AppColors.primary.withAlpha(155),
+      backgroundColorAppBar: AppColors.primary,
       screens: _pages,
       initPositionSelected: 0,
       slidePercent: 40,
       elevationAppBar: 0,
       styleAutoTittleName: titleStyle(),
+      isTitleCentered: true,
     );
   }
 }

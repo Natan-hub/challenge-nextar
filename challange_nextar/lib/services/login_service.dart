@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class LoginService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   User? currentUser;
   UserModel? dataUser;
 
@@ -19,7 +20,8 @@ class LoginService {
         email: email,
         password: password,
       );
-      currentUser = result.user;
+      await loadCurrentLogin(firebaseAuth: result.user);
+      // currentUser = result.user;
       return currentUser;
     } catch (e) {
       throw Exception('Erro ao realizar login: ${e.toString()}');
@@ -27,8 +29,8 @@ class LoginService {
   }
 
   // Carrega o usuário atual e seus dados
-  Future<void> loadCurrentLogin() async {
-    currentUser = _auth.currentUser;
+  Future<void> loadCurrentLogin({User? firebaseAuth}) async {
+    currentUser = firebaseAuth ?? _auth.currentUser;
     if (currentUser != null) {
       final docSnapshot =
           await _firestore.collection('users').doc(currentUser!.uid).get();

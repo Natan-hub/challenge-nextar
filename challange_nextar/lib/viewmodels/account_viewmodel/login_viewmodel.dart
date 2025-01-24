@@ -1,6 +1,7 @@
 import 'package:challange_nextar/components/flush_bar_component.dart';
 import 'package:challange_nextar/models/login_model.dart';
 import 'package:challange_nextar/models/user_model.dart';
+import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/services/login_service.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,7 +61,22 @@ class LoginViewModel extends ChangeNotifier {
         );
 
         if (loggedUser != null) {
-          print("AQUII: ${loggedUser.uid}");
+          currentUser = loggedUser;
+          dataUser = _loginService.dataUser;
+
+          Navigator.pushReplacementNamed(
+            context,
+            Routes.hiddenDrawer,
+          );
+
+          FlushBarComponente.mostrar(
+            context,
+            'Acesso realizado com sucesso',
+            Icons.check_circle_rounded,
+            AppColors.verdePadrao,
+          );
+
+          notifyListeners(); // Notifica sobre o login bem-sucedido
         }
       }
     } catch (e) {
