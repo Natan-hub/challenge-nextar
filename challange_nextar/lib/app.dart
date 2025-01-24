@@ -1,5 +1,8 @@
 import 'package:challange_nextar/routes/routes.dart';
+import 'package:animated_splash_screen/animated_splash_screen.dart';
+
 import 'package:challange_nextar/utils/colors.dart';
+import 'package:challange_nextar/utils/images.dart';
 import 'package:challange_nextar/viewmodels/forgot_password_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/client_viewmodel.dart';
@@ -33,7 +36,13 @@ class MyApp extends StatelessWidget {
         title: 'Challenger Nextar',
         debugShowCheckedModeBanner: false,
         onGenerateRoute: Pages.generateRoute,
-        home: const LoginView(),
+        home: AnimatedSplashScreen(
+          splash: AppImages.splashGif,
+          nextScreen: const LoginView(),
+          splashIconSize: 1500,
+          centered: true,
+          duration: 2900,
+        ),
         theme: ThemeData(
           useMaterial3: false,
           primaryColor: AppColors.primary,
