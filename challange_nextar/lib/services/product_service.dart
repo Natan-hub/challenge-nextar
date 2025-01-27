@@ -19,8 +19,8 @@ class ProductService {
           await _firestore.collection('products').get();
 
       _allProducts = snapProducts.docs
-          .map((doc) =>
-              ProductModel.fromFirestore(doc.data() as Map<String, dynamic>))
+          .map((doc) => ProductModel.fromFirestore(
+              doc.id, doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw Exception('Erro ao carregar produtos: ${e.toString()}');

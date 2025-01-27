@@ -104,16 +104,16 @@ class ProductView extends StatelessWidget {
                 children: [
                   Text(
                     'R\$ ${product.price}', // Pode ser dinâmico se os dados forem fornecidos
-                    style: TextStyle(fontSize: 13, color: Colors.black),
+                    style: const TextStyle(fontSize: 13, color: Colors.black),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 4,
                   ),
-                  Text(
+                  const Text(
                     'em até 10x sem juros',
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 4,
                   ),
                 ],

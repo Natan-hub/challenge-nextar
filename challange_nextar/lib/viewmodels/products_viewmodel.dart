@@ -56,4 +56,13 @@ class ProductViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  ProductModel? findProductById(String id) {
+    _products = _productService.allProducts;
+    try {
+      return _products.firstWhere((p) => p.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
 }
