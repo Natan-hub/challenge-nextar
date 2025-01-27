@@ -22,7 +22,7 @@ class LoginViewModel extends ChangeNotifier {
   UserModel? dataUser;
 
   LoginViewModel() {
-    _loadCurrentUser();
+    loadCurrentUser();
   }
 
   // Alterna a visibilidade da senha
@@ -32,7 +32,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   // Carrega o usuário atual e seus dados
-  Future<void> _loadCurrentUser() async {
+  Future<void> loadCurrentUser() async {
     await _loginService.loadCurrentLogin();
     currentUser = _loginService.currentUser;
     dataUser = _loginService.dataUser;
