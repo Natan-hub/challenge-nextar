@@ -1,8 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:challange_nextar/components/app_bar_component.dart';
 import 'package:challange_nextar/models/product_model.dart';
+import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class DetailsProduct extends StatefulWidget {
   final ProductModel product;
@@ -25,6 +27,20 @@ class _DetailsProductState extends State<DetailsProduct> {
       appBar: AppBarComponente(
         isTitulo: widget.product.name,
         isVoltar: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_rounded, color: Colors.black,),
+            onPressed: () {
+              Navigator.pushReplacementNamed(
+                context,
+                Routes.editProduct,
+                arguments: {
+                  'product': widget.product,
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -32,44 +48,47 @@ class _DetailsProductState extends State<DetailsProduct> {
               EdgeInsets.only(top: MediaQuery.of(context).padding.top - 10),
           child: Column(
             children: [
-              CarouselSlider.builder(
-                itemCount: widget.product.images.length,
-                itemBuilder: (context, index, realIndex) {
-                  final imageUrl = widget.product.images[index];
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox(
-                      width: MediaQuery.of(context)
-                          .size
-                          .width, // Ocupa toda a largura disponível
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit
-                            .contain, // Garante que a imagem preencha todo o card
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Icon(
-                              Icons.image_not_supported,
-                              size: 50,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
+              AspectRatio(
+                aspectRatio: 1,
+                child: CarouselSlider.builder(
+                  itemCount: widget.product.images.length,
+                  itemBuilder: (context, index, realIndex) {
+                    final imageUrl = widget.product.images[index];
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: SizedBox(
+                        width: MediaQuery.of(context)
+                            .size
+                            .width, // Ocupa toda a largura disponível
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit
+                              .contain, // Garante que a imagem preencha todo o card
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 50,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  );
-                },
-                options: CarouselOptions(
-                  height: 250, // Altura do carrossel
-                  enableInfiniteScroll: true,
-
-                  enlargeCenterPage: true,
-                  autoPlay: false,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
+                    );
                   },
+                  options: CarouselOptions(
+                    height: 250, // Altura do carrossel
+                    enableInfiniteScroll: true,
+                  viewportFraction: 0.9,
+                    enlargeCenterPage: true,
+                    autoPlay: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                  ),
                 ),
               ),
 
