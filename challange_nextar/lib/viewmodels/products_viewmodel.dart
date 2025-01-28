@@ -7,37 +7,59 @@ class ProductViewModel extends ChangeNotifier {
 
   List<ProductModel> _products = [];
   bool _isLoading = false;
+  bool _hasMoreProducts = true; // Indica se há mais produtos para carregar
 
   String? _selectedFilter;
 
   List<ProductModel> get products => _products;
   bool get isLoading => _isLoading;
+  bool get hasMoreProducts => _hasMoreProducts;
+
   String? get selectedFilter => _selectedFilter;
 
   ProductViewModel() {
-    _loadProducts();
+    loadInitialProducts();
   }
 
-  Future<void> _loadProducts() async {
+  Future<void> loadInitialProducts() async {
+    _productService.resetPagination(); // Reseta a paginação
+    _products.clear();
+    _hasMoreProducts = true;
+    await _loadNextBatch();
+  }
+
+  Future<void> loadMoreProducts() async {
+    if (_isLoading || !_hasMoreProducts) return;
+    await _loadNextBatch();
+  }
+
+    Future<void> _loadNextBatch() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      await _productService.loadAllProducts();
-      _products = _productService.allProducts;
+      final newProducts = await _productService.loadNextBatch();
+      _products.addAll(newProducts);
+
+      // Verifica se há mais produtos
+      if (newProducts.length < _productService.batchSize) {
+        _hasMoreProducts = false;
+      }
     } catch (e) {
-      debugPrint('Erro ao carregar produtos: $e');
+      debugPrint('Erro ao carregar mais produtos: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
+
+
   void applyFilter(String filter) {
     if (_selectedFilter == filter) {
       // Se o filtro já está ativo, limpa o filtro
       _selectedFilter = null;
-      _loadProducts(); // Recarrega os produtos sem filtros
+      loadInitialProducts(); // Recarrega os produtos sem filtros
     } else {
       // Aplica o filtro
       _selectedFilter = filter;

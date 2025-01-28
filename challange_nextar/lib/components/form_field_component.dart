@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 class FormFieldComponent extends StatelessWidget {
   final TextEditingController? controller;
   final String labelText;
+  final String? initialValue;
   final bool? obscureText;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
@@ -35,6 +36,7 @@ class FormFieldComponent extends StatelessWidget {
     this.controller,
     this.onFieldSubmitted,
     required this.labelText,
+    this.initialValue,
     this.obscureText = false,
     this.prefixIcon,
     this.suffixIcon,
@@ -48,6 +50,7 @@ class FormFieldComponent extends StatelessWidget {
     return Padding(
       padding: padding,
       child: TextFormField(
+        initialValue: initialValue,
         maxLength: maxLength,
         textInputAction: textInputAction,
         inputFormatters: inputFormatters,
