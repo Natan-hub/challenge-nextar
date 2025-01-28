@@ -4,7 +4,6 @@ import 'package:challange_nextar/models/product_model.dart';
 import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class DetailsProduct extends StatefulWidget {
   final ProductModel product;
@@ -23,13 +22,19 @@ class _DetailsProductState extends State<DetailsProduct> {
 
   @override
   Widget build(BuildContext context) {
+    int stock = widget.product.stock;
+
     return Scaffold(
+      
       appBar: AppBarComponente(
         isTitulo: widget.product.name,
         isVoltar: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_rounded, color: Colors.black,),
+            icon: const Icon(
+              Icons.edit_rounded,
+              color: Colors.black,
+            ),
             onPressed: () {
               Navigator.pushReplacementNamed(
                 context,
@@ -46,7 +51,7 @@ class _DetailsProductState extends State<DetailsProduct> {
         child: Padding(
           padding:
               EdgeInsets.only(top: MediaQuery.of(context).padding.top - 10),
-          child: Column(
+          child: Column( 
             children: [
               AspectRatio(
                 aspectRatio: 1,
@@ -54,16 +59,15 @@ class _DetailsProductState extends State<DetailsProduct> {
                   itemCount: widget.product.images.length,
                   itemBuilder: (context, index, realIndex) {
                     final imageUrl = widget.product.images[index];
-                    return ClipRRect(
+                    return ClipRRect( 
                       borderRadius: BorderRadius.circular(8),
-                      child: SizedBox(
+                      child: SizedBox( 
                         width: MediaQuery.of(context)
                             .size
                             .width, // Ocupa toda a largura disponível
-                        child: Image.network(
+                        child: Image.network( 
                           imageUrl,
-                          fit: BoxFit
-                              .contain, // Garante que a imagem preencha todo o card
+                          fit: BoxFit.contain, // Garante que a imagem preencha todo o card
                           errorBuilder: (context, error, stackTrace) {
                             return const Center(
                               child: Icon(
@@ -79,8 +83,9 @@ class _DetailsProductState extends State<DetailsProduct> {
                   },
                   options: CarouselOptions(
                     height: 250, // Altura do carrossel
+                
                     enableInfiniteScroll: true,
-                  viewportFraction: 0.9,
+                    viewportFraction: 0.9,
                     enlargeCenterPage: true,
                     autoPlay: false,
                     onPageChanged: (index, reason) {
@@ -112,13 +117,15 @@ class _DetailsProductState extends State<DetailsProduct> {
                 ),
               ),
 
+              const SizedBox(height: 8),
+
               // Informações detalhadas
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                decoration:   BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
                   ),
@@ -189,10 +196,13 @@ class _DetailsProductState extends State<DetailsProduct> {
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 8),
+
                     Text(
-                      'Estoque disponível',
+                      stock > 0 ? 'Estoque disponível' : 'Estoque indisponível',
                       style: TextStyle(
-                        color: AppColors.verdePadrao,
+                        color: stock > 0
+                            ? AppColors.verdePadrao
+                            : AppColors.vermelhoPadrao,
                         fontSize: 13,
                       ),
                     ),

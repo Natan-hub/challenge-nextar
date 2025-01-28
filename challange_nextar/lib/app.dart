@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
           duration: 2900,
         ),
         theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
           useMaterial3: false,
           primaryColor: AppColors.primary,
           textSelectionTheme: const TextSelectionThemeData(

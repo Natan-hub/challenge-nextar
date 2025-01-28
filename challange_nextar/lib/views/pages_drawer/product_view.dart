@@ -1,3 +1,4 @@
+import 'package:challange_nextar/components/floatin_button_component.dart';
 import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
@@ -12,30 +13,56 @@ class ProductView extends StatelessWidget {
     final productViewModel = Provider.of<ProductViewModel>(context);
 
     return Scaffold(
-      body: productViewModel.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                itemCount: productViewModel.products.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Dois itens por linha
-                  crossAxisSpacing: 10, // Espaço horizontal entre os itens
-                  mainAxisSpacing: 10, // Espaço vertical entre os itens
-                  childAspectRatio: 0.65, // Proporção largura/altura
-                ),
-                itemBuilder: (context, index) {
-                  final product = productViewModel.products[index];
-                  return _buildProductCard(context, product);
-                },
-              ),
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent &&
+              productViewModel.hasMoreProducts &&
+              !productViewModel.isLoading) {
+            productViewModel.loadMoreProducts();
+          }
+          return false;
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: productViewModel.isLoading &&
+                      productViewModel.products.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                        itemCount: productViewModel.products.length +
+                            (productViewModel.hasMoreProducts ? 1 : 0),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.65,
+                        ),
+                        itemBuilder: (context, index) {
+                          if (index == productViewModel.products.length) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          final product = productViewModel.products[index];
+                          return _buildProductCard(context, product);
+                        },
+                      ),
+                    ),
             ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary2,
+          ],
+        ),
+      ),
+      floatingActionButton: FabMenuButton(
         onPressed: () {
           _showFilterDialog(context, productViewModel);
         },
-        child: const Icon(Icons.filter_list),
+        onPressed2: () {
+
+        },
       ),
     );
   }
@@ -56,68 +83,103 @@ class ProductView extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         elevation: 3,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            // Imagem do Produto
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
-                ),
-                child: Image.network(
-                  product.images.first,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.image_not_supported,
-                      size: 50,
-                      color: Colors.grey,
-                    );
-                  },
-                ),
-              ),
-            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Imagem do Produto com sobreposição para "Sem Estoque"
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          product.images.first,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.image_not_supported,
+                              size: 50,
+                              color: Colors.grey,
+                            );
+                          },
+                        ),
 
-            // Título do Produto
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: Text(
-                product.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                        // Exibe a faixa de "Sem Estoque" se o estoque for 0
+                        if (product.stock == 0)
+                          Positioned(
+                            top: 50,
+                            left: 0,
+                            right: 0,
+                            child: Transform.rotate(
+                              angle: -0.7, // Inclinação da faixa
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary2,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'SEM ESTOQUE',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            // Informações adicionais
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'R\$ ${product.price}', // Pode ser dinâmico se os dados forem fornecidos
-                    style: const TextStyle(fontSize: 13, color: Colors.black),
+                // Título do Produto
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
+                  child: Text(
+                    product.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
-                  const SizedBox(
-                    height: 4,
+                ),
+
+                // Informações adicionais
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'R\$ ${product.price}', // Pode ser dinâmico se os dados forem fornecidos
+                        style:
+                            const TextStyle(fontSize: 13, color: Colors.black),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'em até 10x sem juros',
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
                   ),
-                  const Text(
-                    'em até 10x sem juros',
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
-                  ),
-                  const SizedBox(
-                    height: 4,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
