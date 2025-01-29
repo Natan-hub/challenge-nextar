@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:challange_nextar/components/form_field_component.dart';
 import 'package:challange_nextar/models/home_model.dart';
+import 'package:challange_nextar/models/product_model.dart';
 import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/images.dart';
@@ -6,13 +10,17 @@ import 'package:challange_nextar/viewmodels/home_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BaseView extends StatelessWidget {
-  const BaseView({super.key});
+  BaseView({super.key});
+
+  final ImagePicker picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -42,13 +50,17 @@ class BaseView extends StatelessWidget {
                       homeManager.sections.map<Widget>((section) {
                     switch (section.type) {
                       case 'List':
-                        return sectionList(context, section);
+                        return sectionList(context, section, homeManager);
                       case 'Staggered':
-                        return sectionStaggered(context, section);
+                        return sectionStaggered(context, section, homeManager);
                       default:
                         return Container();
                     }
                   }).toList();
+
+                  if (homeManager.editing) {
+                    children.add(addSectionWidget(homeManager));
+                  }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,6 +71,41 @@ class BaseView extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      floatingActionButton: Consumer<HomeViewModel>(
+        builder: (_, homeManager, __) {
+          return homeManager.editing
+              ? FloatingActionButton(
+                  backgroundColor: AppColors.primary2,
+                  shape: const CircleBorder(),
+                  onPressed: null,
+                  child: PopupMenuButton<String>(
+                    onSelected: (e) {
+                      if (e == 'Salvar') {
+                        homeManager.saveEditing();
+                      } else {
+                        homeManager.discardEditing();
+                      }
+                    },
+                    itemBuilder: (_) => ['Salvar', 'Descartar']
+                        .map((e) => PopupMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    icon: const Icon(
+                      Icons.more_vert,
+                      color: Colors.white,
+                    ),
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                )
+              : FloatingActionButton(
+                  onPressed: homeManager.enterEditing,
+                  backgroundColor: AppColors.primary2,
+                  child: const Icon(Icons.edit_rounded),
+                );
+        },
       ),
     );
   }
@@ -124,27 +171,51 @@ class BaseView extends StatelessWidget {
     );
   }
 
-  Widget sectionList(BuildContext context, HomeModel section) {
+  Widget sectionList(BuildContext context, HomeModel section, homeManager) {
     return Container(
       margin: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            section.name,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              fontSize: 18,
-            ),
-          ),
+          titleSection(context, section, homeManager),
           SizedBox(
             height: 150,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemBuilder: (_, index) {
-                final item =
-                    section.items[index]; // Obtenha o objeto HomeItem atual
+                void onImageSelected(
+                    File file, BuildContext context, HomeModel section) {
+                  context.read<HomeViewModel>().addItemToSection(section, file);
+                  Navigator.of(context).pop();
+                }
+
+                // Se for um índice válido, define a variável item
+                final bool isLastItem = index >= section.items.length;
+                final HomeItem? item = isLastItem ? null : section.items[index];
+
+                // Se for o último item, retorna o botão de adicionar imagem
+                if (isLastItem) {
+                  return AspectRatio(
+                    aspectRatio: 1,
+                    child: GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => imageSourceSheet(
+                            context,
+                            (file) => onImageSelected(file, context, section),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        color: Colors.grey.shade100,
+                        child: const Icon(Icons.add, color: Colors.black),
+                      ),
+                    ),
+                  );
+                }
+
+                // Se for um item válido, permite a exclusão ao pressionar longamente
                 return AspectRatio(
                   aspectRatio: 1,
                   child: InkWell(
@@ -157,20 +228,75 @@ class BaseView extends StatelessWidget {
                           Navigator.pushNamed(
                             context,
                             Routes.detailsProduct,
-                            arguments: {
-                              'product': product,
-                            },
+                            arguments: {'product': product},
                           );
                         }
                       }
                     },
+                    onLongPress: homeManager.editing && item != null
+                        ? () {
+                            showDialog(
+  context: context,
+  builder: (_) {
+    final productId = item.product?.isNotEmpty == true ? item.product : null;
+    final product = productId != null
+        ? context.read<ProductViewModel>().findProductById(productId)
+        : null;
+
+    return AlertDialog(
+      title: const Text('Editar Item'),
+      content: product != null
+          ? ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Image.network(product.images.first),
+              title: Text(product.name),
+              subtitle: Text("R\$ ${product.price}"),
+            )
+          : const Text("Nenhum produto vinculado."),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            context.read<HomeViewModel>().removeItem(section, item);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Excluir'),
+        ),
+        TextButton(
+          onPressed: () async {
+            if (product != null) {
+              // 🔹 Desvincula o produto corretamente
+              final newItem = item.copyWith(product: null);
+              context.read<HomeViewModel>().updateItem(section, newItem);
+            } else {
+              // 🔹 Abre a tela para selecionar um produto
+              final selectedProduct = await Navigator.of(context).pushNamed(
+                Routes.selectedProduct,
+              ) as ProductModel?;
+
+              if (selectedProduct != null) {
+                final newItem = item.copyWith(product: selectedProduct.id);
+                context.read<HomeViewModel>().updateItem(section, newItem);
+              }
+            }
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            product != null ? "Desvincular" : "Vincular",
+          ),
+        ),
+      ],
+    );
+  },
+);
+
+                          }
+                        : null,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: AspectRatio(
                         aspectRatio: 1,
                         child: FadeInImage.memoryNetwork(
-                          image: item
-                              .image, // Acesse o campo 'image' do objeto HomeItem
+                          image: item!.image, // Garantimos que item não é nulo
                           fit: BoxFit.cover,
                           placeholder: kTransparentImage,
                           imageErrorBuilder: (context, error, stackTrace) {
@@ -188,31 +314,25 @@ class BaseView extends StatelessWidget {
                   ),
                 );
               },
-              separatorBuilder: (_, __) => const SizedBox(
-                width: 4,
-              ),
-              itemCount: section.items.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 4),
+              itemCount: homeManager.editing
+                  ? section.items.length + 1
+                  : section.items.length,
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget sectionStaggered(BuildContext context, HomeModel section) {
+  Widget sectionStaggered(
+      BuildContext context, HomeModel section, homeManager) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            section.name,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              fontSize: 18,
-            ),
-          ),
+          titleSection(context, section, homeManager),
           GridView.custom(
             padding: const EdgeInsets.all(8),
             physics: const NeverScrollableScrollPhysics(),
@@ -278,5 +398,123 @@ class BaseView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  titleSection(context, section, homeManager) {
+    if (homeManager.editing) {
+      return Row(
+        children: <Widget>[
+          Expanded(
+            child: FormFieldComponent(
+              initialValue: section.name,
+              onChanged: (text) => section.name = text,
+              labelText: 'Título',
+              hintText: '',
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_rounded),
+            color: AppColors.vermelhoPadrao,
+            onPressed: () {
+              homeManager.removeSection(section);
+            },
+          ),
+        ],
+      );
+    } else {
+      return Text(
+        section.name ?? "Erro ao retornar texto",
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w800,
+          fontSize: 18,
+        ),
+      );
+    }
+  }
+
+  Widget addSectionWidget(homeManager) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: TextButton(
+            onPressed: () {
+              homeManager.addSection(
+                  HomeModel(name: 'Nova Seção', type: 'List', items: []));
+            },
+            child: const Text('Adicionar Lista'),
+          ),
+        ),
+        Expanded(
+          child: TextButton(
+            onPressed: () {
+              homeManager.addSection(
+                  HomeModel(name: 'Nova Grade', type: 'Staggered', items: []));
+            },
+            child: const Text('Adicionar Grade'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  imageSourceSheet(BuildContext context, Function(File) onImageSelected) {
+    return BottomSheet(
+      onClosing: () {},
+      builder: (_) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          TextButton(
+            onPressed: () async {
+              // Abre a câmera
+              final XFile? file =
+                  await picker.pickImage(source: ImageSource.camera);
+              if (file != null) {
+                editImage(File(file.path), onImageSelected, context);
+              }
+            },
+            child: const Text('Câmera'),
+          ),
+          TextButton(
+            onPressed: () async {
+              // Abre a galeria
+              final XFile? file =
+                  await picker.pickImage(source: ImageSource.gallery);
+              if (file != null) {
+                editImage(File(file.path), onImageSelected, context);
+              }
+            },
+            child: const Text('Galeria'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> editImage(
+    File file,
+    Function(File) onImageSelected,
+    BuildContext context,
+  ) async {
+    final CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: file.path,
+      aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Editar Imagem',
+          toolbarColor: Theme.of(context).primaryColor,
+          toolbarWidgetColor: Colors.white,
+          lockAspectRatio: true,
+        ),
+      ],
+    );
+
+    if (croppedFile != null) {
+      onImageSelected(File(croppedFile.path)); // Agora é um `File`
+    }
   }
 }

@@ -324,7 +324,7 @@ class _EditProductViewState extends State<EditProductView>
     );
   }
 
-  imageSourceSheet(BuildContext contex, Function(File) onImageSelected) {
+  imageSourceSheet(BuildContext context, Function(File) onImageSelected) {
     return BottomSheet(
       onClosing: () {},
       builder: (_) => Column(

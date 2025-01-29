@@ -4,6 +4,7 @@ import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/views/account/login_view.dart';
 import 'package:challange_nextar/views/details_product.dart';
 import 'package:challange_nextar/views/pages_drawer/edit_product.dart';
+import 'package:challange_nextar/views/pages_drawer/select_product_view.dart';
 import 'package:flutter/material.dart';
 
 class Pages {
@@ -41,6 +42,11 @@ class Pages {
           builder: (context) => EditProductView(
             product: product,
           ),
+        );
+
+      case Routes.selectedProduct:
+        return MaterialPageRoute(
+          builder: (context) => const SelecetedProductView(),
         );
 
       default:
