@@ -1,15 +1,18 @@
-import 'dart:ui';
 import 'package:challange_nextar/components/flush_bar_component.dart';
+import 'package:challange_nextar/components/native_dialog.dart';
 import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/images.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
+import 'package:challange_nextar/views/pages_drawer/my_data_view.dart';
+import 'package:challange_nextar/views/pages_drawer/my_email_view.dart';
+import 'package:challange_nextar/views/pages_drawer/my_password_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:babstrap_settings_screen/babstrap_settings_screen.dart';
+import 'package:provider/provider.dart';
 
 class MinhaConta extends StatefulWidget {
   const MinhaConta({super.key});
@@ -53,6 +56,7 @@ class _ConfigContaState extends State<ConfigConta> {
 
   @override
   Widget build(BuildContext context) {
+    final viewModelLogin = Provider.of<LoginViewModel>(context);
     orientation = MediaQuery.of(context).orientation;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -174,7 +178,7 @@ class _ConfigContaState extends State<ConfigConta> {
                   isDismissible: false,
                   context: context,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => Placeholder(),
+                  builder: (context) => const MeusDados(),
                 );
               },
               icons: CupertinoIcons.pencil_outline,
@@ -195,7 +199,7 @@ class _ConfigContaState extends State<ConfigConta> {
                   isDismissible: false,
                   context: context,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => Placeholder(),
+                  builder: (context) => const MudarSenha(),
                 );
               },
               icons: Icons.password,
@@ -214,7 +218,7 @@ class _ConfigContaState extends State<ConfigConta> {
                   isDismissible: false,
                   context: context,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => Placeholder(),
+                  builder: (context) => const MudarEmail(),
                 );
               },
               icons: CupertinoIcons.repeat,
@@ -232,33 +236,15 @@ class _ConfigContaState extends State<ConfigConta> {
           items: [
             SettingsItem(
               onTap: () {
-                // showPlatformDialog(
-                //   context: context,
-                //   builder: (context) => BasicDialogAlert(
-                //     title: Text(
-                //       "Sair da sua conta?",
-                //     ),
-                //     actions: <Widget>[
-                //       BasicDialogAction(
-                //         title: Text(
-                //           "Cancelar",
-                //           style: const TextStyle(color: Colors.blue),
-                //         ),
-                //         onPressed: () {
-                //           Navigator.pop(context, false);
-                //         },
-                //       ),
-                //       BasicDialogAction(
-                //           title: Text(
-                //             "Sair",
-                //             style: const TextStyle(color: Colors.blue),
-                //           ),
-                //           onPressed: () async {
-                //             await logoff(context);
-                //           }),
-                //     ],
-                //   ),
-                // );
+                NativeDialog.showConfirmation(
+                    context: context,
+                    title: "Sair da conta?",
+                    message: '',
+                    confirmButtonText: "Sim",
+                    cancelButtonText: "Cancelar",
+                    onConfirm: () async {
+                      await logoffEmpresa(context, viewModelLogin);
+                    });
               },
               icons: Icons.exit_to_app_rounded,
               title: "Sair da conta",
@@ -276,11 +262,11 @@ class _ConfigContaState extends State<ConfigConta> {
       context: context,
       barrierDismissible: false, // Impede que o usuário feche o diálogo
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Desconectando..."),
+        return const AlertDialog(
+          title: Text("Desconectando..."),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               CircularProgressIndicator(strokeWidth: 2),
             ],
           ),

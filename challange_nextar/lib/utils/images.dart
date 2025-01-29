@@ -4,4 +4,6 @@ class AppImages {
   static const modeloRoupa = "assets/images/modelo.png";
   static const splashGif = "assets/images/splashGif.gif";
   static const splashPicture = "assets/images/splashPicture.png";
+  static const profile = "assets/images/profile.svg";
+  static const changeEmail = "assets/images/change_email.svg";
 }
