@@ -6,16 +6,19 @@ import 'package:challange_nextar/components/form_field_component.dart';
 import 'package:challange_nextar/models/product_model.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/validators/validacoes_mixin.dart';
+import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class EditProductView extends StatefulWidget {
-  final ProductModel product;
+  final ProductModel? product;
 
   const EditProductView({
     super.key,
-    required this.product,
+    this.product,
   });
 
   @override
@@ -30,43 +33,79 @@ class _EditProductViewState extends State<EditProductView>
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  late ProductModel product;
+  bool isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isEditing = widget.product != null;
+    product = widget.product?.copyWith() ??
+        ProductModel(
+          id: const Uuid().v4(),
+          name: '',
+          description: '',
+          price: '',
+          stock: 0,
+          images: [],
+        );
+  }
+
+  Future<void> _saveProduct() async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      await context.read<ProductViewModel>().saveProduct(product, isEditing);
+      Navigator.pop(context);
+    }
+  }
+
+  void onImageSelected(File file) {
+    setState(() {
+      product.localImages.add(file); // Agora as imagens locais são separadas
+    });
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isSaving = context.watch<ProductViewModel>().isSaving;
+
+    final List<dynamic> allImages = [...product.images, ...product.localImages];
+
     return Scaffold(
-      appBar: const AppBarComponente(
-        isTitulo: 'Editando produto',
+      appBar: AppBarComponente(
+        isTitulo: isEditing ? 'Editando Produto' : 'Novo Produto',
       ),
       body: Form(
         key: formKey,
         child: ListView(
           children: [
             FormField<List<dynamic>>(
-              initialValue: List.from(widget.product.images),
-              validator: (images) => isNotEmptyImage(images, context),
+              initialValue: product.images,
+              validator: (images) => isNotEmptyImage(allImages, context),
               builder: (state) {
-                void onImageSelected(File file) {
-                  state.value?.add(file);
-                  state.didChange(state.value);
-                  Navigator.of(context).pop();
-                }
+                // void onImageSelected(File file) {
+                //   state.value?.add(file);
+                //   state.didChange(state.value);
+                //   Navigator.of(context).pop();
+                // }
 
                 return Column(
                   children: [
                     AspectRatio(
                       aspectRatio: 1,
                       child: CarouselSlider.builder(
-                        itemCount: (state.value?.length ?? 0) +
-                            1, // Adiciona um item extra para o botão
+                        itemCount: allImages.length +
+                            1, // Considera imagens locais e URLs
                         itemBuilder: (context, index, realIndex) {
-                          if (index == state.value?.length) {
-                            // Último item: botão para adicionar foto
+                          if (index >= allImages.length) {
+                            // Se o index for maior que o número de imagens, exibe o botão de adicionar foto
                             return Material(
                               child: IconButton(
                                 icon: const Icon(Icons.add_a_photo),
                                 color: Theme.of(context).primaryColor,
                                 iconSize: 50,
                                 onPressed: () {
-                                  // Mostra o modal para selecionar imagem
                                   showModalBottomSheet(
                                     context: context,
                                     builder: (_) => imageSourceSheet(
@@ -79,29 +118,36 @@ class _EditProductViewState extends State<EditProductView>
                             );
                           }
 
-                          final image = state.value![index];
+                          // Agora garantimos que o índice está dentro dos limites
+                          final image = allImages[index];
+
                           return Stack(
-                            // fit: StackFit.expand,
                             children: <Widget>[
                               if (image is String)
                                 Image.network(
                                   image,
                                   fit: BoxFit.cover,
                                 )
-                              else
+                              else if (image is File)
                                 Image.file(
                                   image,
                                   fit: BoxFit.cover,
                                 ),
-                              // Botão de remover a imagem
                               Align(
                                 alignment: Alignment.topRight,
                                 child: IconButton(
                                   icon: const Icon(Icons.delete_rounded),
                                   color: AppColors.vermelhoPadrao,
                                   onPressed: () {
-                                    state.value?.remove(image);
-                                    state.didChange(state.value);
+                                    setState(() {
+                                      if (image is String) {
+                                        product.images.remove(
+                                            image); // Remove URL do Firebase
+                                      } else {
+                                        product.localImages.remove(
+                                            image); // Remove arquivo local
+                                      }
+                                    });
                                   },
                                 ),
                               ),
@@ -161,8 +207,9 @@ class _EditProductViewState extends State<EditProductView>
                             // Nome do produto
                             FormFieldComponent(
                               labelText: "Editando titulo",
-                              initialValue: widget.product.name,
+                              initialValue: product.name,
                               hintText: "Nome do seu produto",
+                              onSaved: (text) => product.name = text!,
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20),
                               validator: (text) => combine([
@@ -184,8 +231,9 @@ class _EditProductViewState extends State<EditProductView>
 
                             FormFieldComponent(
                               labelText: "Editando preço",
-                              initialValue: widget.product.price,
+                              initialValue: product.price,
                               hintText: "Preço do seu produto",
+                              onSaved: (text) => product.price = text!,
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20),
                               keyboardType:
@@ -217,12 +265,14 @@ class _EditProductViewState extends State<EditProductView>
 
                             FormFieldComponent(
                               labelText: "Editando estoque",
-                              initialValue: widget.product.stock.toString(),
+                              initialValue: product.stock.toString(),
                               hintText: "Quantidade do seu produto",
                               keyboardType:
                                   const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
+                              onSaved: (text) =>
+                                  product.stock = int.parse(text!),
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20),
                               validator: (text) => combine([
@@ -235,11 +285,7 @@ class _EditProductViewState extends State<EditProductView>
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  if (formKey.currentState!.validate()) {
-                                    print('válido!!!');
-                                  }
-                                },
+                                onPressed: isSaving ? null : _saveProduct,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.teal,
                                   padding:
@@ -248,13 +294,9 @@ class _EditProductViewState extends State<EditProductView>
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                child: const Text(
-                                  "Salvar",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                child: isSaving
+                                    ? const CircularProgressIndicator()
+                                    : const Text("Salvar Produto"),
                               ),
                             ),
                           ],
@@ -295,7 +337,7 @@ class _EditProductViewState extends State<EditProductView>
               final XFile? file =
                   await picker.pickImage(source: ImageSource.camera);
               if (file != null) {
-                editImage(file.path, onImageSelected, context);
+                editImage(File(file.path), onImageSelected, context);
               }
             },
             child: const Text('Câmera'),
@@ -306,7 +348,7 @@ class _EditProductViewState extends State<EditProductView>
               final XFile? file =
                   await picker.pickImage(source: ImageSource.gallery);
               if (file != null) {
-                editImage(file.path, onImageSelected, context);
+                editImage(File(file.path), onImageSelected, context);
               }
             },
             child: const Text('Galeria'),
@@ -317,12 +359,12 @@ class _EditProductViewState extends State<EditProductView>
   }
 
   Future<void> editImage(
-    String path,
+    File file,
     Function(File) onImageSelected,
     BuildContext context,
   ) async {
     final CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: path,
+      sourcePath: file.path,
       aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
       uiSettings: [
         AndroidUiSettings(
@@ -335,7 +377,7 @@ class _EditProductViewState extends State<EditProductView>
     );
 
     if (croppedFile != null) {
-      onImageSelected(File(croppedFile.path));
+      onImageSelected(File(croppedFile.path)); // Agora é um `File`
     }
   }
 
@@ -348,7 +390,8 @@ class _EditProductViewState extends State<EditProductView>
         validator: (val) => combine([
           () => isNotEmpty(val, context),
         ]),
-        initialValue: widget.product.description,
+        onSaved: (text) => product.description = text!,
+        initialValue: product.description,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         maxLength: 5000,
         maxLines: 10,

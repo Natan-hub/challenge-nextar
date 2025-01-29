@@ -32,9 +32,11 @@ class Pages {
         );
 
       case Routes.editProduct:
-        final Map<String, dynamic> arguments =
-            settings.arguments as Map<String, dynamic>;
-        final ProductModel product = arguments['product'];
+        final arguments = settings.arguments;
+        final ProductModel? product =
+            arguments != null && arguments is Map<String, dynamic>
+                ? arguments['product'] as ProductModel?
+                : null;
         return MaterialPageRoute(
           builder: (context) => EditProductView(
             product: product,

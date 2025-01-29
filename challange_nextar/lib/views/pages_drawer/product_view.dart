@@ -22,46 +22,53 @@ class ProductView extends StatelessWidget {
           }
           return false;
         },
-        child: Column(
-          children: [
-            Expanded(
-              child: productViewModel.isLoading &&
-                      productViewModel.products.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GridView.builder(
-                        itemCount: productViewModel.products.length +
-                            (productViewModel.hasMoreProducts ? 1 : 0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 0.65,
-                        ),
-                        itemBuilder: (context, index) {
-                          if (index == productViewModel.products.length) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
+        child: Consumer<ProductViewModel>(
+            builder: (context, productViewModel, child) {
+          return Column(
+            children: [
+              Expanded(
+                child: productViewModel.isLoading &&
+                        productViewModel.products.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GridView.builder(
+                          itemCount: productViewModel.products.length +
+                              (productViewModel.hasMoreProducts ? 1 : 0),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.65,
+                          ),
+                          itemBuilder: (context, index) {
+                            if (index == productViewModel.products.length) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
 
-                          final product = productViewModel.products[index];
-                          return _buildProductCard(context, product);
-                        },
+                            final product = productViewModel.products[index];
+                            return _buildProductCard(context, product);
+                          },
+                        ),
                       ),
-                    ),
-            ),
-          ],
-        ),
+              ),
+            ],
+          );
+        }),
       ),
       floatingActionButton: FabMenuButton(
         onPressed: () {
           _showFilterDialog(context, productViewModel);
         },
-        onPressed2: () {
-
+        onPressed2: () async {
+          // Adiciona um produto e notifica ao voltar
+          await Navigator.pushNamed(
+            context,
+            Routes.editProduct,
+          );
         },
       ),
     );

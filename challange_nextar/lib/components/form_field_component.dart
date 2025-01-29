@@ -16,6 +16,7 @@ class FormFieldComponent extends StatelessWidget {
   final void Function(String? text)? onChanged;
   final List<TextInputFormatter>? inputFormatters;
   final void Function()? onTap;
+  final void Function(String?)? onSaved;
   final String hintText;
   final EdgeInsetsGeometry padding;
   final TextStyle? hintStyle;
@@ -33,6 +34,7 @@ class FormFieldComponent extends StatelessWidget {
     required this.hintText,
     this.inputFormatters,
     this.onTap,
+    this.onSaved,
     this.controller,
     this.onFieldSubmitted,
     required this.labelText,
@@ -59,6 +61,7 @@ class FormFieldComponent extends StatelessWidget {
         keyboardType: keyboardType,
         validator: validator,
         onTap: onTap,
+        onSaved: onSaved,
         cursorColor: AppColors.primary2,
         onChanged: onChanged,
         controller: controller,

@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 class ProductViewModel extends ChangeNotifier {
   final ProductService _productService = ProductService();
 
+  bool _isSaving = false;
+  bool get isSaving => _isSaving;
+
   List<ProductModel> _products = [];
   bool _isLoading = false;
   bool _hasMoreProducts = true; // Indica se há mais produtos para carregar
@@ -21,6 +24,21 @@ class ProductViewModel extends ChangeNotifier {
     loadInitialProducts();
   }
 
+  Future<void> saveProduct(ProductModel product, bool isEditing) async {
+    _isSaving = true;
+    notifyListeners();
+
+    try {
+      await _productService.saveProduct(product, isEditing);
+      await loadInitialProducts(); // Atualiza a lista de produtos após salvar
+    } catch (e) {
+      debugPrint("Erro ao salvar produto: $e");
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> loadInitialProducts() async {
     _productService.resetPagination(); // Reseta a paginação
     _products.clear();
@@ -33,7 +51,7 @@ class ProductViewModel extends ChangeNotifier {
     await _loadNextBatch();
   }
 
-    Future<void> _loadNextBatch() async {
+  Future<void> _loadNextBatch() async {
     _isLoading = true;
     notifyListeners();
 
@@ -52,8 +70,6 @@ class ProductViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-
 
   void applyFilter(String filter) {
     if (_selectedFilter == filter) {

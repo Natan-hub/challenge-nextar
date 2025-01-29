@@ -105,10 +105,15 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   // Faz logout do usuário
-  Future<void> signOut() async {
-    await _loginService.signOut();
-    currentUser = null;
-    dataUser = null;
-    notifyListeners();
+  Future<bool> signOut() async {
+    try {
+      await _loginService.signOut();
+      currentUser = null;
+      dataUser = null;
+      notifyListeners();
+      return true; // Retorna sucesso
+    } catch (e) {
+      return false; // Retorna falha
+    }
   }
 }
