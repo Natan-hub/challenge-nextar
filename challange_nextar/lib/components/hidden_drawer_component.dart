@@ -2,6 +2,7 @@ import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/styles.dart';
 import 'package:challange_nextar/views/pages_drawer/client_view.dart';
 import 'package:challange_nextar/views/pages_drawer/home_view.dart';
+import 'package:challange_nextar/views/pages_drawer/my_account_view.dart';
 import 'package:challange_nextar/views/pages_drawer/product_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
@@ -64,7 +65,7 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
           selectedStyle: drawerMenuSelectedStyle(),
           colorLineSelected: AppColors.primary2,
         ),
-        Placeholder(),
+        MinhaConta(),
       ),
     ];
   }
