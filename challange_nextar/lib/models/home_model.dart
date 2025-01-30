@@ -32,25 +32,32 @@ class HomeItem {
   }
 }
 
-
 class HomeModel extends ChangeNotifier {
-  String? name;
+  String? id;
+  String name;
   final String type;
-  List<HomeItem> items = [];
+  List<HomeItem> items;
+  int pos;
+  String? _error;
 
   HomeModel({
-    this.name,
+    this.id,
+    required this.name,
     required this.type,
     required this.items,
+    required this.pos,
   });
 
-  factory HomeModel.fromFirestore(Map<String, dynamic> data) {
+  factory HomeModel.fromFirestore(
+      Map<String, dynamic> data, String documentId) {
     return HomeModel(
-      name: data['name'] ?? '',
-      type: data['type'] ?? '',
-      items: (data['items'] as List)
+      id: documentId,
+      name: data['name'],
+      type: data['type'] ?? 'List',
+      items: (data['items'] as List<dynamic>? ?? [])
           .map((item) => HomeItem.fromMap(item as Map<String, dynamic>))
           .toList(),
+      pos: data['pos'] ?? 0,
     );
   }
 
@@ -59,14 +66,18 @@ class HomeModel extends ChangeNotifier {
       'name': name,
       'type': type,
       'items': items.map((item) => item.toMap()).toList(),
+      'pos': pos,
     };
   }
 
-  HomeModel copyWith({String? name, String? type, List<HomeItem>? items}) {
+  HomeModel copyWith(
+      {String? name, String? type, List<HomeItem>? items, int? pos}) {
     return HomeModel(
+      id: id,
       name: name ?? this.name,
       type: type ?? this.type,
       items: items ?? List.from(this.items),
+      pos: pos ?? this.pos,
     );
   }
 
@@ -79,4 +90,19 @@ class HomeModel extends ChangeNotifier {
     items.remove(item);
     notifyListeners();
   }
+
+  bool valid() {
+    if (name.trim().isEmpty) {
+      _error = "Título inválido";
+      return false;
+    } else if (items.isEmpty) {
+      _error = "Insira ao menos uma imagem";
+      return false;
+    } else {
+      _error = null;
+      return true;
+    }
+  }
+
+  String? get error => _error;
 }

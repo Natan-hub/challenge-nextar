@@ -9,32 +9,52 @@ class HomeService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   Stream<List<HomeModel>> listenToSections() {
-    return _firestore.collection('home').snapshots().map((snapshot) {
+    return _firestore
+        .collection('home')
+        .orderBy('pos')
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
-        return HomeModel.fromFirestore(doc.data());
+        return HomeModel.fromFirestore(doc.data(), doc.id);
       }).toList();
     });
   }
 
-  Future<void> saveSections(List<HomeModel> sections) async {
-    final batch = _firestore.batch();
+  Future<void> saveSection(HomeModel section, int pos) async {
     final collection = _firestore.collection('home');
 
-    for (var section in sections) {
-      final docRef = collection.doc(section.name);
-      batch.set(docRef, section.toMap(), SetOptions(merge: true));
+    if (section.id == null) {
+      // Cria um novo documento no Firestore
+      final docRef = await collection.add(section.toMap());
+      section.id = docRef.id; // 🔹 Atualiza o ID no modelo
+      await collection
+          .doc(section.id)
+          .update({'id': section.id}); // 🔹 Salva o ID no Firestore
+    } else {
+      // Atualiza o documento existente
+      await collection
+          .doc(section.id)
+          .set(section.toMap(), SetOptions(merge: true));
     }
-
-    await batch.commit();
   }
 
   Future<void> deleteSection(HomeModel section) async {
-    await _firestore.collection('home').doc(section.name).delete();
+    if (section.id != null) {
+      await _firestore.collection('home').doc(section.id).delete();
+
+      // 🔹 Deleta todas as imagens do Storage associadas à seção
+      for (final item in section.items) {
+        if (item.image is String) {
+          await deleteImage(item.image as String);
+        }
+      }
+    }
   }
 
   Future<String> uploadImage(File file) async {
     try {
-      String fileName = 'home/${const Uuid().v1()}.jpg'; // 🔹 Usa UUID para nome único
+      String fileName =
+          'home/${const Uuid().v1()}.jpg'; // 🔹 Usa UUID para nome único
       Reference ref = _storage.ref().child(fileName);
       UploadTask uploadTask = ref.putFile(file);
       TaskSnapshot snapshot = await uploadTask;

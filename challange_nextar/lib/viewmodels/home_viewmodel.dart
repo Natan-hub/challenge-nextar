@@ -8,10 +8,23 @@ class HomeViewModel extends ChangeNotifier {
 
   List<HomeModel> _sections = [];
   List<HomeModel> _editingSections = [];
+
   bool _editing = false;
+  bool _loading = false;
+
+  String? _error;
+
+  String? get error => _error;
 
   bool get editing => _editing;
+  bool get loading => _loading;
+
   List<HomeModel> get sections => _editing ? _editingSections : _sections;
+
+  set error(String? value) {
+    _error = value;
+    notifyListeners();
+  }
 
   HomeViewModel() {
     _listenToSections();
@@ -33,11 +46,41 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void saveEditing() {
+  Future<void> saveEditing() async {
+    bool isValid = true;
+
+    for (final section in _editingSections) {
+      if (!section.valid()) {
+        isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      error = "Erro ao salvar. Verifique os campos!";
+      notifyListeners();
+      return;
+    }
+
+    _loading = true;
+    notifyListeners();
+
+    int pos = 0;
+    for (final section in _editingSections) {
+      await _homeService.saveSection(section, pos);
+      pos++;
+    }
+
+    // 🔹 Remover seções que não existem mais
+    for (final section in List.from(_sections)) {
+      if (!_editingSections.any((element) => element.id == section.id)) {
+        await _homeService.deleteSection(section);
+      }
+    }
+
+    _loading = false;
     _editing = false;
     _sections = List.from(_editingSections);
     notifyListeners();
-    _homeService.saveSections(_sections);
   }
 
   void discardEditing() {
@@ -84,21 +127,23 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-void updateItem(HomeModel section, HomeItem updatedItem) {
-  int sectionIndex = _editingSections.indexWhere((s) => s.name == section.name);
-  
-  if (sectionIndex != -1) {
-    List<HomeItem> updatedItems = List.from(_editingSections[sectionIndex].items);
-    
-    int itemIndex = updatedItems.indexWhere((item) => item.image == updatedItem.image);
+  void updateItem(HomeModel section, HomeItem updatedItem) {
+    int sectionIndex =
+        _editingSections.indexWhere((s) => s.name == section.name);
 
-    if (itemIndex != -1) {
-      updatedItems[itemIndex] = updatedItem; 
-      _editingSections[sectionIndex] = section.copyWith(items: updatedItems);
-      
-      notifyListeners(); 
+    if (sectionIndex != -1) {
+      List<HomeItem> updatedItems =
+          List.from(_editingSections[sectionIndex].items);
+
+      int itemIndex =
+          updatedItems.indexWhere((item) => item.image == updatedItem.image);
+
+      if (itemIndex != -1) {
+        updatedItems[itemIndex] = updatedItem;
+        _editingSections[sectionIndex] = section.copyWith(items: updatedItems);
+
+        notifyListeners();
+      }
     }
   }
-}
-
 }

@@ -27,85 +27,97 @@ class BaseView extends StatelessWidget {
     // Acessa o LoginViewModel para obter os dados do usuário
     final loginViewModel = Provider.of<LoginViewModel>(context);
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Bem-vindo(a) a sua loja ${loginViewModel.dataUser?.name ?? 'Erro ao acessar o nome da conta'}",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Bem-vindo(a) a sua loja ${loginViewModel.dataUser?.name ?? 'Erro ao acessar o nome da conta'}",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              bannerCard(context),
-              Consumer<HomeViewModel>(
-                builder: (_, homeManager, __) {
-                  final List<Widget> children =
-                      homeManager.sections.map<Widget>((section) {
-                    switch (section.type) {
-                      case 'List':
-                        return sectionList(context, section, homeManager);
-                      case 'Staggered':
-                        return sectionStaggered(context, section, homeManager);
-                      default:
-                        return Container();
+                const SizedBox(height: 20),
+                bannerCard(context),
+                Consumer<HomeViewModel>(
+                  builder: (_, homeManager, __) {
+                    final List<Widget> children =
+                        homeManager.sections.map<Widget>((section) {
+                      switch (section.type) {
+                        case 'List':
+                          return sectionList(context, section, homeManager);
+                        case 'Staggered':
+                          return sectionStaggered(
+                              context, section, homeManager);
+                        default:
+                          return Container();
+                      }
+                    }).toList();
+
+                    if (homeManager.editing) {
+                      children.add(addSectionWidget(homeManager));
                     }
-                  }).toList();
 
-                  if (homeManager.editing) {
-                    children.add(addSectionWidget(homeManager));
-                  }
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: children,
-                  );
-                },
-              ),
-            ],
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: children,
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton: Consumer<HomeViewModel>(
-        builder: (_, homeManager, __) {
-          return homeManager.editing
-              ? FloatingActionButton(
-                  backgroundColor: AppColors.primary2,
-                  shape: const CircleBorder(),
-                  onPressed: null,
-                  child: PopupMenuButton<String>(
-                    onSelected: (e) {
-                      if (e == 'Salvar') {
-                        homeManager.saveEditing();
-                      } else {
-                        homeManager.discardEditing();
-                      }
-                    },
-                    itemBuilder: (_) => ['Salvar', 'Descartar']
-                        .map((e) => PopupMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    icon: const Icon(
-                      Icons.more_vert,
+        floatingActionButton: Consumer<HomeViewModel>(
+          builder: (_, homeManager, __) {
+            if (homeManager.loading) {
+              return Container(); // 🔹 Esconde o botão enquanto está carregando
+            }
+            return homeManager.editing
+                ? FloatingActionButton(
+                    backgroundColor: AppColors.primary2,
+                    shape: const CircleBorder(),
+                    onPressed: null,
+                    child: PopupMenuButton<String>(
+                      onSelected: (e) {
+                        if (e == 'Salvar') {
+                          homeManager.saveEditing();
+                        } else {
+                          homeManager.discardEditing();
+                        }
+                      },
+                      itemBuilder: (_) => ['Salvar', 'Descartar']
+                          .map((e) => PopupMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: Colors.white,
+                      ),
                       color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                )
-              : FloatingActionButton(
-                  onPressed: homeManager.enterEditing,
-                  backgroundColor: AppColors.primary2,
-                  child: const Icon(Icons.edit_rounded),
-                );
-        },
+                  )
+                : FloatingActionButton(
+                    onPressed: homeManager.enterEditing,
+                    backgroundColor: AppColors.primary2,
+                    child: const Icon(Icons.edit_rounded),
+                  );
+          },
+        ),
       ),
     );
   }
@@ -236,59 +248,77 @@ class BaseView extends StatelessWidget {
                     onLongPress: homeManager.editing && item != null
                         ? () {
                             showDialog(
-  context: context,
-  builder: (_) {
-    final productId = item.product?.isNotEmpty == true ? item.product : null;
-    final product = productId != null
-        ? context.read<ProductViewModel>().findProductById(productId)
-        : null;
+                              context: context,
+                              builder: (_) {
+                                final productId =
+                                    item.product?.isNotEmpty == true
+                                        ? item.product
+                                        : null;
+                                final product = productId != null
+                                    ? context
+                                        .read<ProductViewModel>()
+                                        .findProductById(productId)
+                                    : null;
 
-    return AlertDialog(
-      title: const Text('Editar Item'),
-      content: product != null
-          ? ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Image.network(product.images.first),
-              title: Text(product.name),
-              subtitle: Text("R\$ ${product.price}"),
-            )
-          : const Text("Nenhum produto vinculado."),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            context.read<HomeViewModel>().removeItem(section, item);
-            Navigator.of(context).pop();
-          },
-          child: const Text('Excluir'),
-        ),
-        TextButton(
-          onPressed: () async {
-            if (product != null) {
-              // 🔹 Desvincula o produto corretamente
-              final newItem = item.copyWith(product: null);
-              context.read<HomeViewModel>().updateItem(section, newItem);
-            } else {
-              // 🔹 Abre a tela para selecionar um produto
-              final selectedProduct = await Navigator.of(context).pushNamed(
-                Routes.selectedProduct,
-              ) as ProductModel?;
+                                return AlertDialog(
+                                  title: const Text('Editar Item'),
+                                  content: product != null
+                                      ? ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          leading: Image.network(
+                                              product.images.first),
+                                          title: Text(product.name),
+                                          subtitle:
+                                              Text("R\$ ${product.price}"),
+                                        )
+                                      : const Text("Nenhum produto vinculado."),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        context
+                                            .read<HomeViewModel>()
+                                            .removeItem(section, item);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Excluir'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        if (product != null) {
+                                          // 🔹 Desvincula o produto corretamente
+                                          final newItem =
+                                              item.copyWith(product: null);
+                                          context
+                                              .read<HomeViewModel>()
+                                              .updateItem(section, newItem);
+                                        } else {
+                                          // 🔹 Abre a tela para selecionar um produto
+                                          final selectedProduct =
+                                              await Navigator.of(context)
+                                                  .pushNamed(
+                                            Routes.selectedProduct,
+                                          ) as ProductModel?;
 
-              if (selectedProduct != null) {
-                final newItem = item.copyWith(product: selectedProduct.id);
-                context.read<HomeViewModel>().updateItem(section, newItem);
-              }
-            }
-            Navigator.of(context).pop();
-          },
-          child: Text(
-            product != null ? "Desvincular" : "Vincular",
-          ),
-        ),
-      ],
-    );
-  },
-);
-
+                                          if (selectedProduct != null) {
+                                            final newItem = item.copyWith(
+                                                product: selectedProduct.id);
+                                            context
+                                                .read<HomeViewModel>()
+                                                .updateItem(section, newItem);
+                                          }
+                                        }
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        product != null
+                                            ? "Desvincular"
+                                            : "Vincular",
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           }
                         : null,
                     child: ClipRRect(
@@ -402,26 +432,42 @@ class BaseView extends StatelessWidget {
 
   titleSection(context, section, homeManager) {
     if (homeManager.editing) {
-      return Row(
-        children: <Widget>[
-          Expanded(
-            child: FormFieldComponent(
-              initialValue: section.name,
-              onChanged: (text) => section.name = text,
-              labelText: 'Título',
-              hintText: '',
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FormFieldComponent(
+                  initialValue: section.name,
+                  onChanged: (text) {
+                    section.name = text;
+                    homeManager.notifyListeners();
+                  },
+                  labelText: 'Título',
+                  hintText: '',
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_rounded),
+                color: AppColors.vermelhoPadrao,
+                onPressed: () {
+                  homeManager.removeSection(section);
+                },
+              ),
+            ],
+          ),
+          if (section.error != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 20, top: 4),
+              child: Text(
+                section.error!,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_rounded),
-            color: AppColors.vermelhoPadrao,
-            onPressed: () {
-              homeManager.removeSection(section);
-            },
-          ),
         ],
       );
     } else {
@@ -436,14 +482,20 @@ class BaseView extends StatelessWidget {
     }
   }
 
-  Widget addSectionWidget(homeManager) {
+  Widget addSectionWidget(HomeViewModel homeManager) {
     return Row(
       children: <Widget>[
         Expanded(
           child: TextButton(
             onPressed: () {
+              int newPos = homeManager.sections.isNotEmpty
+                  ? homeManager.sections.last.pos + 1
+                  : 0; // Se não houver seções, começa do 0
+
               homeManager.addSection(
-                  HomeModel(name: 'Nova Seção', type: 'List', items: []));
+                HomeModel(
+                    name: 'Nova Seção', type: 'List', items: [], pos: newPos),
+              );
             },
             child: const Text('Adicionar Lista'),
           ),
@@ -451,8 +503,17 @@ class BaseView extends StatelessWidget {
         Expanded(
           child: TextButton(
             onPressed: () {
+              int newPos = homeManager.sections.isNotEmpty
+                  ? homeManager.sections.last.pos + 1
+                  : 0;
+
               homeManager.addSection(
-                  HomeModel(name: 'Nova Grade', type: 'Staggered', items: []));
+                HomeModel(
+                    name: 'Nova Grade',
+                    type: 'Staggered',
+                    items: [],
+                    pos: newPos),
+              );
             },
             child: const Text('Adicionar Grade'),
           ),
