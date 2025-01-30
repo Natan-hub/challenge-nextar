@@ -59,6 +59,14 @@ class _EditProductViewState extends State<EditProductView>
     }
   }
 
+  Future<void> _deleteProduct() async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      await context.read<ProductViewModel>().deleteProduct(product);
+      Navigator.pop(context);
+    }
+  }
+
   void onImageSelected(File file) {
     setState(() {
       product.localImages.add(file); // Agora as imagens locais são separadas
@@ -75,6 +83,17 @@ class _EditProductViewState extends State<EditProductView>
     return Scaffold(
       appBar: AppBarComponente(
         isTitulo: isEditing ? 'Editando Produto' : 'Novo Produto',
+        isVoltar: true,
+        actions: [
+          isEditing
+              ? IconButton(
+                  onPressed: isSaving ? null : _deleteProduct,
+                  icon: const Icon(
+                    Icons.delete_rounded,
+                    color: Colors.black,
+                  ))
+              : const SizedBox()
+        ],
       ),
       body: Form(
         key: formKey,

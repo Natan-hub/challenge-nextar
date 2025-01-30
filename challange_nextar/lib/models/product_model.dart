@@ -10,6 +10,7 @@ class ProductModel {
   int stock;
   List<String> images;
   List<File> localImages = []; // Armazena imagens locais temporariamente
+  bool deleted; // Novo campo para exclusão lógica
 
   ProductModel({
     required this.id,
@@ -18,6 +19,7 @@ class ProductModel {
     required this.price,
     required this.stock,
     required this.images,
+    this.deleted = false,
   });
 
   // Criar um clone do produto para edição
@@ -49,6 +51,7 @@ class ProductModel {
       price: data['price'] ?? '',
       stock: data['stock'] ?? 0,
       images: List<String>.from(data['images'] ?? []),
+      deleted: data['deleted'] ?? false,
     );
   }
 
@@ -60,6 +63,7 @@ class ProductModel {
       'price': price,
       'stock': stock,
       'images': images,
+      'deleted': deleted,
     };
   }
 }

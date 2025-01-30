@@ -24,6 +24,14 @@ class ProductView extends StatelessWidget {
         },
         child: Consumer<ProductViewModel>(
             builder: (context, productViewModel, child) {
+              
+          if (productViewModel.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (productViewModel.products.isEmpty) {
+            return const Center(child: Text("Nenhum produto disponível"));
+          }
           return Column(
             children: [
               Expanded(

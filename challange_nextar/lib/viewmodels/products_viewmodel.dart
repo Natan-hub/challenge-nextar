@@ -39,6 +39,21 @@ class ProductViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteProduct(ProductModel product) async {
+    _isSaving = true;
+    notifyListeners();
+
+    try {
+      await _productService.deleteProduct(product);
+      _products.removeWhere((p) => p.id == product.id); // Remove localmente
+    } catch (e) {
+      debugPrint("Erro ao deletar produto: $e");
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> loadInitialProducts() async {
     _productService.resetPagination(); // Reseta a paginação
     _products.clear();

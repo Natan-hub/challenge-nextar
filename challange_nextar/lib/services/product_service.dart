@@ -73,6 +73,24 @@ class ProductService {
     }
   }
 
+  Future<void> deleteProduct(ProductModel product) async {
+    try {
+      // Marcar como deletado no Firestore
+      await _firestore.collection('products').doc(product.id).update({
+        'deleted': true,
+      });
+
+      // Remover imagens do Firebase Storage
+      for (final imageUrl in product.images) {
+        await _deleteImageFromStorage(imageUrl);
+      }
+    } catch (e) {
+      throw Exception("Erro ao deletar produto: $e");
+    }
+  }
+
+  
+
   Future<void> _deleteImageFromStorage(String imageUrl) async {
     try {
       Reference ref = _storage.refFromURL(imageUrl);
