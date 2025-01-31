@@ -45,7 +45,7 @@ class ProductViewModel extends ChangeNotifier {
 
     try {
       await _productService.deleteProduct(product);
-      _products.removeWhere((p) => p.id == product.id); // Remove localmente
+      await loadInitialProducts(); // 🔹 Recarrega a lista para garantir que o produto sumiu
     } catch (e) {
       debugPrint("Erro ao deletar produto: $e");
     } finally {
@@ -72,7 +72,9 @@ class ProductViewModel extends ChangeNotifier {
 
     try {
       final newProducts = await _productService.loadNextBatch();
-      _products.addAll(newProducts);
+      _products = newProducts
+          .where((p) => !p.deleted)
+          .toList(); // Filtra produtos deletados
 
       // Verifica se há mais produtos
       if (newProducts.length < _productService.batchSize) {

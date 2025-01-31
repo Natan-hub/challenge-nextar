@@ -24,7 +24,7 @@ class ProductView extends StatelessWidget {
         },
         child: Consumer<ProductViewModel>(
             builder: (context, productViewModel, child) {
-              
+
           if (productViewModel.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -67,7 +67,7 @@ class ProductView extends StatelessWidget {
           );
         }),
       ),
-      floatingActionButton: FabMenuButton(
+      floatingActionButton: FabMenuButton(  
         onPressed: () {
           _showFilterDialog(context, productViewModel);
         },

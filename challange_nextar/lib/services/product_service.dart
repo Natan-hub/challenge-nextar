@@ -73,23 +73,24 @@ class ProductService {
     }
   }
 
-  Future<void> deleteProduct(ProductModel product) async {
+  Future<void> deleteProduct(ProductModel product,
+      {bool removeImages = false}) async {
     try {
       // Marcar como deletado no Firestore
       await _firestore.collection('products').doc(product.id).update({
         'deleted': true,
       });
 
-      // Remover imagens do Firebase Storage
-      for (final imageUrl in product.images) {
-        await _deleteImageFromStorage(imageUrl);
+      // ⚠️ Só remove imagens se realmente quiser deletá-las do Firebase
+      if (removeImages) {
+        for (final imageUrl in product.images) {
+          await _deleteImageFromStorage(imageUrl);
+        }
       }
     } catch (e) {
       throw Exception("Erro ao deletar produto: $e");
     }
   }
-
-  
 
   Future<void> _deleteImageFromStorage(String imageUrl) async {
     try {
@@ -119,9 +120,12 @@ class ProductService {
   // Carrega o próximo lote de produtos
   Future<List<ProductModel>> loadNextBatch() async {
     try {
-      Query query = _firestore.collection('products').limit(batchSize);
+      Query query = _firestore
+          .collection('products')
+          .where('deleted',
+              isEqualTo: false) // 🔹 Filtra produtos não deletados
+          .limit(batchSize);
 
-      // Adiciona a condição de início se houver um último documento
       if (_lastDocument != null) {
         query = query.startAfterDocument(_lastDocument!);
       }
@@ -129,14 +133,14 @@ class ProductService {
       final QuerySnapshot snapProducts = await query.get();
 
       if (snapProducts.docs.isNotEmpty) {
-        _lastDocument = snapProducts.docs.last; // Atualiza o último documento
+        _lastDocument = snapProducts.docs.last;
       }
 
       final products = snapProducts.docs
           .map((doc) => ProductModel.fromFirestore(doc))
           .toList();
 
-      _allProducts.addAll(products); // Atualiza a lista de produtos carregados
+      _allProducts.addAll(products);
       return products;
     } catch (e) {
       throw Exception('Erro ao carregar produtos: ${e.toString()}');
