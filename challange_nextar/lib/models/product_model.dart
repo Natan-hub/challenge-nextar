@@ -10,8 +10,8 @@ class ProductModel {
   int stock;
   List<String> images;
   List<File> localImages = []; // Armazena imagens locais temporariamente
-  bool deleted; // Novo campo para exclusão lógica
-
+  bool deleted;
+  
   ProductModel({
     required this.id,
     required this.name,

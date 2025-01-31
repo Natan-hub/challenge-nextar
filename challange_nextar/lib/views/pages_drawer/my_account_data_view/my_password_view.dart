@@ -6,22 +6,19 @@ import 'package:challange_nextar/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class MudarEmail extends StatefulWidget {
-  const MudarEmail({
+class MudarSenha extends StatelessWidget {
+  const MudarSenha({
     super.key,
   });
 
-  @override
-  State<MudarEmail> createState() => _MudarEmailState();
-}
-
-class _MudarEmailState extends State<MudarEmail> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: const AppBarComponente(isTitulo: "Alterar email"),
+        appBar: const AppBarComponent(
+          isTitulo: "Privacidade",
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(vertical: 20),
@@ -32,20 +29,39 @@ class _MudarEmailState extends State<MudarEmail> {
                   width: 250,
                   height: 250,
                   child: SvgPicture.asset(
-                    AppImages.changeEmail,
+                    AppImages.esqueciSenhaImagem,
                   ),
                 ),
                 const FormFieldComponent(
-                  maxLength: 250,
                   padding: EdgeInsets.symmetric(horizontal: 18),
                   textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(
-                    Icons.email,
+                    Icons.lock,
                     color: AppColors.primary,
                   ),
-                  labelText: "Email",
-                  hintText: "Ex: nome@gmail.com ",
+                  labelText: "Senha atual",
+                  hintText: "",
+                ),
+                const SizedBox(height: 10),
+                const FormFieldComponent(
+                  padding: EdgeInsets.symmetric(horizontal: 18),
+                  textInputAction: TextInputAction.next,
+                  prefixIcon: Icon(
+                    Icons.lock,
+                    color: AppColors.primary,
+                  ),
+                  labelText: "Nova senha",
+                  hintText: "",
+                ),
+                const SizedBox(height: 10),
+                const FormFieldComponent(
+                  padding: EdgeInsets.symmetric(horizontal: 18),
+                  prefixIcon: Icon(
+                    Icons.lock,
+                    color: AppColors.primary,
+                  ),
+                  labelText: "Confirmar nova senha",
+                  hintText: "",
                 ),
                 const SizedBox(height: 25),
                 botaoAlterarDados(context)
@@ -58,9 +74,9 @@ class _MudarEmailState extends State<MudarEmail> {
   }
 
   Widget botaoAlterarDados(BuildContext context) {
-    return BotaoPadrao(
+    return DefaultButton(
       borderRadius: BorderRadius.circular(10),
-      nomeBotao: "Alterar email",
+      nomeBotao: "Alterar senha",
       cor: AppColors.corBotao,
       padding: const EdgeInsets.symmetric(horizontal: 123, vertical: 20),
       onPressed: () {},

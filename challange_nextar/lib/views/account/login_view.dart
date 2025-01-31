@@ -23,65 +23,74 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> with ValidacoesMixin {
   @override
   Widget build(BuildContext context) {
-    final viewModelLogin = Provider.of<LoginViewModel>(context);
+    final viewModelLogin = context.watch<LoginViewModel>();
 
-    return GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          extendBodyBehindAppBar: true,
-          appBar: const AppBarComponente(
-            isTitulo: 'Login',
-          ),
-          body: Form(
-            key: viewModelLogin.loginKey,
-            child: SafeArea(
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 150,
-                        height: 150,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            AppImages.logoEmpresa,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+      },
+      child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            extendBodyBehindAppBar: true,
+            appBar: const AppBarComponent(
+              isTitulo: 'Acessar sua conta',
+            ),
+            body: Form(
+              key: viewModelLogin.loginKey,
+              child: SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 150,
+                          height: 150,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              AppImages.logoEmpresa,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 50,
-                      ),
-                      Text(
-                        'Realize o login para acessar a loja.',
-                        style: normalTextStyle(
-                          AppColors.primary,
+                        const SizedBox(
+                          height: 50,
                         ),
-                      ),
-                      const SizedBox(height: 25),
-                      _buildEmailField(viewModelLogin),
-                      const SizedBox(height: 10),
-                      _buildPasswordField(viewModelLogin),
-                      const SizedBox(height: 10),
-                      _buildForgotPassword(context),
-                      const SizedBox(height: 25),
-                      _buildLoginButton(viewModelLogin),
-                      const SizedBox(height: 25),
-                      _buildSignUp(),
-                    ],
+                        Text(
+                          'Realize o login para acessar a loja.',
+                          style: normalTextStyle(
+                            AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        _buildEmailField(viewModelLogin),
+                        const SizedBox(height: 10),
+                        _buildPasswordField(viewModelLogin),
+                        const SizedBox(height: 10),
+                        _buildForgotPassword(context),
+                        const SizedBox(height: 25),
+                        _buildLoginButton(viewModelLogin),
+                        const SizedBox(height: 25),
+                        _buildSignUp(),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 
   Widget _buildEmailField(LoginViewModel viewModelLogin) {
     return FormFieldComponent(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.zero,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
       prefixIcon: const Icon(
@@ -100,7 +109,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
 
   Widget _buildPasswordField(LoginViewModel viewModelLogin) {
     return FormFieldComponent(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.zero,
       textInputAction: TextInputAction.done,
       prefixIcon: const Icon(
         Icons.lock_rounded,
@@ -126,34 +135,21 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
     );
   }
 
-  Padding _buildForgotPassword(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          InkWell(
-            onTap: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-              showCupertinoModalBottomSheet(
-                isDismissible: false,
-                enableDrag: false,
-                context: context,
-                backgroundColor: Colors.transparent,
-                builder: (context) => const ForgotPasswordView(),
-              );
-            },
-            child: Text(
-              'Esqueceu a senha?',
-              style: normalTextStyleDefault(
-                AppColors.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildForgotPassword(BuildContext context) => Align(
+        alignment: Alignment.centerRight,
+        child: TextButton(
+          onPressed: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            showCupertinoModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const ForgotPasswordView(),
+            );
+          },
+          child: Text('Esqueceu a senha?',
+              style: normalTextStyleDefault(AppColors.primary)),
+        ),
+      );
 
   Widget _buildSignUp() {
     return Row(
@@ -179,7 +175,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
   }
 
   Widget _buildLoginButton(LoginViewModel viewModelLogin) {
-    return BotaoPadrao(
+    return DefaultButton(
       borderRadius: BorderRadius.circular(10),
       cor: AppColors.corBotao,
       padding: const EdgeInsets.fromLTRB(115, 20, 115, 20),

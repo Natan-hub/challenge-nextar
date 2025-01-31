@@ -1,4 +1,4 @@
-import 'package:challange_nextar/routes/pages.dart';
+import 'package:challange_nextar/helper/init_app_helper.dart';
 import 'package:challange_nextar/routes/routes.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:challange_nextar/utils/colors.dart';
@@ -60,38 +60,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SplashHandler extends StatefulWidget {
-  const SplashHandler({super.key});
-
-  @override
-  State<SplashHandler> createState() => _SplashHandlerState();
-}
-
-class _SplashHandlerState extends State<SplashHandler> {
-  late LoginViewModel loginViewModel;
-
-  @override
-  void initState() {
-    super.initState();
-    loginViewModel = Provider.of<LoginViewModel>(context, listen: false);
-    _checkLoginStatus();
-  }
-
-  Future<void> _checkLoginStatus() async {
-    await loginViewModel.loadCurrentUser();
-    if (loginViewModel.currentUser != null) {
-      Navigator.pushReplacementNamed(context, Routes.hiddenDrawer);
-    } else {
-      Navigator.pushReplacementNamed(context, Routes.login);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      ),
-    );
-  }
-}

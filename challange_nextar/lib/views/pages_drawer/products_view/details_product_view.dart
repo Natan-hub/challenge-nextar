@@ -26,7 +26,7 @@ class _DetailsProductState extends State<DetailsProduct> {
 
     return Scaffold(
       
-      appBar: AppBarComponente(
+      appBar: AppBarComponent(
         isTitulo: widget.product.name,
         isVoltar: true,
         actions: [
@@ -38,7 +38,7 @@ class _DetailsProductState extends State<DetailsProduct> {
             onPressed: () {
               Navigator.pushReplacementNamed(
                 context,
-                Routes.editProduct,
+                Routes.editAddProduct,
                 arguments: {
                   'product': widget.product,
                 },

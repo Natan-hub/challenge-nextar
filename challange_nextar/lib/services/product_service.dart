@@ -15,6 +15,7 @@ class ProductService {
 
   List<ProductModel> get allProducts => _allProducts;
 
+  /// Salva um produto no Firestore. Se for edição, atualiza o documento existente.
   Future<void> saveProduct(ProductModel product, bool isEditing) async {
     try {
       final List<String> updatedImages =
@@ -61,6 +62,8 @@ class ProductService {
     }
   }
 
+  /// Realiza o upload de uma imagem para o Firebase Storage e retorna a URL.
+
   Future<String> _uploadImage(File imageFile, String productId) async {
     try {
       String fileName = 'products/$productId/${const Uuid().v4()}.jpg';
@@ -72,6 +75,8 @@ class ProductService {
       throw Exception("Erro ao fazer upload da imagem: $e");
     }
   }
+
+  /// Marca um produto como deletado no Firestore.
 
   Future<void> deleteProduct(ProductModel product,
       {bool removeImages = false}) async {
@@ -117,7 +122,8 @@ class ProductService {
         .update(product.toMap());
   }
 
-  // Carrega o próximo lote de produtos
+  /// Carrega o próximo lote de produtos do Firestore.
+
   Future<List<ProductModel>> loadNextBatch() async {
     try {
       Query query = _firestore
@@ -147,7 +153,8 @@ class ProductService {
     }
   }
 
-  // Reseta a paginação
+  /// Reseta a paginação e limpa a lista de produtos.
+
   void resetPagination() {
     _lastDocument = null;
     _allProducts.clear();

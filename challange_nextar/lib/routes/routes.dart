@@ -2,9 +2,9 @@ import 'package:challange_nextar/components/hidden_drawer_component.dart';
 import 'package:challange_nextar/models/product_model.dart';
 import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/views/account/login_view.dart';
-import 'package:challange_nextar/views/details_product.dart';
-import 'package:challange_nextar/views/pages_drawer/edit_product.dart';
-import 'package:challange_nextar/views/pages_drawer/select_product_view.dart';
+import 'package:challange_nextar/views/pages_drawer/products_view/details_product_view.dart';
+import 'package:challange_nextar/views/pages_drawer/products_view/edit_add_product_view.dart';
+import 'package:challange_nextar/views/pages_drawer/home_view/select_product_view.dart';
 import 'package:flutter/material.dart';
 
 class Pages {
@@ -32,7 +32,7 @@ class Pages {
           ),
         );
 
-      case Routes.editProduct:
+      case Routes.editAddProduct:
         final arguments = settings.arguments;
         final ProductModel? product =
             arguments != null && arguments is Map<String, dynamic>

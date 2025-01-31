@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BotaoPadrao extends StatefulWidget {
+class DefaultButton extends StatefulWidget {
   final String nomeBotao;
   final Color cor;
   final Color? corOutlined;
@@ -14,7 +14,7 @@ class BotaoPadrao extends StatefulWidget {
   final BorderRadiusGeometry borderRadius;
   final EdgeInsetsGeometry? padding;
 
-  const BotaoPadrao({
+  const DefaultButton({
     super.key,
     required this.nomeBotao,
     required this.cor,
@@ -31,12 +31,12 @@ class BotaoPadrao extends StatefulWidget {
   });
 
   @override
-  State<BotaoPadrao> createState() => _BotaoPadraoState();
+  State<DefaultButton> createState() => _DefaultButtonState();
 }
 
 final loading = ValueNotifier<bool>(false);
 
-class _BotaoPadraoState extends State<BotaoPadrao> {
+class _DefaultButtonState extends State<DefaultButton> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(

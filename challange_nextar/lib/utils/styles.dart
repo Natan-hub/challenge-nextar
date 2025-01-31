@@ -2,11 +2,19 @@ import 'package:challange_nextar/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-TextStyle titleStyle() {
+TextStyle titleStyle([Color? color]) {
   return GoogleFonts.dmSans(
     fontSize: 20,
     fontWeight: FontWeight.w800,
-    color: Colors.white,
+    color: color ?? Colors.white,
+  );
+}
+
+TextStyle principalTextStyle() {
+  return GoogleFonts.dmSans(
+    fontSize: 22,
+    fontWeight: FontWeight.w800,
+    color: Colors.grey.shade700,
   );
 }
 
@@ -37,13 +45,29 @@ TextStyle normalTextStyleDefault(
   Color color,
 ) {
   return GoogleFonts.dmSans(
+    fontWeight: FontWeight.w500,
     fontSize: 14,
     color: color,
   );
 }
 
+TextStyle subTextStyle() {
+  return GoogleFonts.dmSans(
+    fontSize: 13,
+    color: Colors.grey.shade600,
+  );
+}
+
 TextStyle normalTextStyleBold(Color color) {
   return GoogleFonts.dmSans(
+    fontWeight: FontWeight.bold,
+    color: color,
+  );
+}
+
+TextStyle highlightedText(Color color) {
+  return GoogleFonts.dmSans(
+    fontSize: 20,
     fontWeight: FontWeight.bold,
     color: color,
   );

@@ -4,9 +4,9 @@ import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/images.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
-import 'package:challange_nextar/views/pages_drawer/my_data_view.dart';
-import 'package:challange_nextar/views/pages_drawer/my_email_view.dart';
-import 'package:challange_nextar/views/pages_drawer/my_password_view.dart';
+import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_data_view.dart';
+import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_email_view.dart';
+import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_password_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,37 +14,37 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:babstrap_settings_screen/babstrap_settings_screen.dart';
 import 'package:provider/provider.dart';
 
-class MinhaConta extends StatefulWidget {
-  const MinhaConta({super.key});
+class MyAccountView extends StatefulWidget {
+  const MyAccountView({super.key});
 
   @override
-  State<MinhaConta> createState() => _MinhaContaState();
+  State<MyAccountView> createState() => _MyAccountViewState();
 }
 
-class _MinhaContaState extends State<MinhaConta> {
+class _MyAccountViewState extends State<MyAccountView> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: SafeArea(
-          child: ConfigConta(),
+          child: ConfigAccount(),
         ),
       ),
     );
   }
 }
 
-class ConfigConta extends StatefulWidget {
-  const ConfigConta({
+class ConfigAccount extends StatefulWidget {
+  const ConfigAccount({
     super.key,
   });
 
   @override
-  State<ConfigConta> createState() => _ConfigContaState();
+  State<ConfigAccount> createState() => _ConfigAccountState();
 }
 
-class _ConfigContaState extends State<ConfigConta> {
+class _ConfigAccountState extends State<ConfigAccount> {
   late Orientation orientation;
 
   @override
@@ -284,7 +284,7 @@ class _ConfigContaState extends State<ConfigConta> {
       if (resposta != null) {
         Navigator.pushReplacementNamed(context, Routes.login);
       } else {
-        FlushBarComponente.mostrar(
+        FlushBarComponent.mostrar(
           context,
           "Erro ao sair da conta",
           Icons.warning_amber,
@@ -295,7 +295,7 @@ class _ConfigContaState extends State<ConfigConta> {
       if (context.mounted) {
         Navigator.pop(context); // Fecha o diálogo de carregamento
 
-        FlushBarComponente.mostrar(
+        FlushBarComponent.mostrar(
           context,
           "Erro ao desconectar. Tente novamente.",
           Icons.warning_amber,

@@ -21,15 +21,14 @@ class ForgotPasswordStateView extends State<ForgotPasswordView>
     with ValidacoesMixin {
   @override
   Widget build(BuildContext context) {
-    final viewModelForgotPaswword =
-        Provider.of<ForgotPasswordViewModel>(context);
+    final viewModelForgotPaswword = context.watch<ForgotPasswordViewModel>();
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         extendBodyBehindAppBar: true,
-        appBar: const AppBarComponente(
+        appBar: const AppBarComponent(
           isTitulo: 'Recuperar senha',
           isVoltar: true,
         ),
@@ -50,15 +49,18 @@ class ForgotPasswordStateView extends State<ForgotPasswordView>
                   height: 25,
                 ),
                 Text(
-                    textAlign: TextAlign.center,
-                    'Esqueceu a senha?',
-                    style: biggerTextStyle()),
+                  textAlign: TextAlign.center,
+                  'Esqueceu a senha?',
+                  style: biggerTextStyle(),
+                ),
                 const SizedBox(
                   height: 25,
                 ),
                 Text(
                   'Por favor, informe o endereço de email associado à sua conta que enviaremos um link para o mesmo com as instruções para recuperação de senha.',
-                  style: normalTextStyle(Colors.black),
+                  style: normalTextStyle(
+                    Colors.black,
+                  ),
                 ),
                 const SizedBox(
                   height: 25,
@@ -99,7 +101,7 @@ class ForgotPasswordStateView extends State<ForgotPasswordView>
 
   Widget _buildRecoverButton(
       ForgotPasswordViewModel viewModelForgotPaswword, BuildContext context) {
-    return BotaoPadrao(
+    return DefaultButton(
       borderRadius: BorderRadius.circular(10),
       nomeBotao: viewModelForgotPaswword.isLoading ? 'Enviando...' : 'Enviar',
       cor: AppColors.corBotao,

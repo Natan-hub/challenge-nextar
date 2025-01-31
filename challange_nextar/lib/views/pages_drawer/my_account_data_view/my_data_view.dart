@@ -16,7 +16,7 @@ class MeusDados extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-          appBar: const AppBarComponente(
+          appBar: const AppBarComponent(
             isTitulo: "Modificar meus dados",
           ),
           body: SafeArea(
@@ -74,7 +74,7 @@ class MeusDados extends StatelessWidget {
   }
 
   Widget botaoAlterarDados(BuildContext context) {
-    return BotaoPadrao(
+    return DefaultButton(
       borderRadius: BorderRadius.circular(10),
       nomeBotao: "Alterar dados",
       cor: AppColors.corBotao,

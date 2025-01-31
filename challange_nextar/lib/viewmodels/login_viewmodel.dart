@@ -69,7 +69,7 @@ class LoginViewModel extends ChangeNotifier {
             Routes.hiddenDrawer,
           );
 
-          FlushBarComponente.mostrar(
+          FlushBarComponent.mostrar(
             context,
             'Acesso realizado com sucesso',
             Icons.check_circle_rounded,
@@ -92,7 +92,7 @@ class LoginViewModel extends ChangeNotifier {
         mensagem = 'Erro desconhecido: $errorMessage';
       }
 
-      FlushBarComponente.mostrar(
+      FlushBarComponent.mostrar(
         context,
         mensagem,
         Icons.warning_amber,
@@ -111,9 +111,16 @@ class LoginViewModel extends ChangeNotifier {
       currentUser = null;
       dataUser = null;
       notifyListeners();
-      return true; // Retorna sucesso
+      return true;
     } catch (e) {
-      return false; // Retorna falha
+      return false;
     }
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }

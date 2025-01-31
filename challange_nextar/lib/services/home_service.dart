@@ -8,6 +8,7 @@ class HomeService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  /// 📌 Escuta as seções no Firestore e retorna um stream de `HomeModel`.
   Stream<List<HomeModel>> listenToSections() {
     return _firestore
         .collection('home')
@@ -20,24 +21,24 @@ class HomeService {
     });
   }
 
+  /// 📌 Salva ou atualiza uma seção no Firestore.
   Future<void> saveSection(HomeModel section, int pos) async {
     final collection = _firestore.collection('home');
 
     if (section.id == null) {
-      // Cria um novo documento no Firestore
       final docRef = await collection.add(section.toMap());
-      section.id = docRef.id; // 🔹 Atualiza o ID no modelo
+      section.id = docRef.id; 
       await collection
           .doc(section.id)
-          .update({'id': section.id}); // 🔹 Salva o ID no Firestore
+          .update({'id': section.id}); 
     } else {
-      // Atualiza o documento existente
       await collection
           .doc(section.id)
           .set(section.toMap(), SetOptions(merge: true));
     }
   }
 
+  /// 📌 Remove uma seção do Firestore e suas imagens associadas no Storage.
   Future<void> deleteSection(HomeModel section) async {
     if (section.id != null) {
       await _firestore.collection('home').doc(section.id).delete();
@@ -51,6 +52,7 @@ class HomeService {
     }
   }
 
+  /// 📌Faz upload de uma imagem para o Firebase Storage e retorna sua URL.
   Future<String> uploadImage(File file) async {
     try {
       String fileName =
@@ -64,6 +66,7 @@ class HomeService {
     }
   }
 
+  /// 📌Remove uma imagem do Firebase Storage.
   Future<void> deleteImage(String imageUrl) async {
     try {
       Reference ref = _storage.refFromURL(imageUrl);

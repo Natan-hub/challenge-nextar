@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class HomeItem {
-  final dynamic image; // Pode ser String (URL) ou File (arquivo local)
-  String? product; // 🔹 Remove o "final" para permitir atualização
+  final dynamic image; 
+  String? product;
 
   HomeItem({
     required this.image,
@@ -19,7 +19,7 @@ class HomeItem {
 
   Map<String, dynamic> toMap() {
     return {
-      'image': image is File ? '' : image, // Armazena apenas URL no Firestore
+      'image': image is File ? '' : image,
       'product': product,
     };
   }
@@ -27,7 +27,7 @@ class HomeItem {
   HomeItem copyWith({dynamic image, String? product}) {
     return HomeItem(
       image: image ?? this.image,
-      product: product, // 🔹 Permite definir `null` corretamente
+      product: product, 
     );
   }
 }

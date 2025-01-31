@@ -19,14 +19,14 @@ class ForgotPasswordViewModel extends ChangeNotifier {
       await Future.delayed(const Duration(seconds: 2));
       clearFields();
       Navigator.pop(context);
-      FlushBarComponente.mostrar(
+      FlushBarComponent.mostrar(
         context,
         'Email enviado',
         Icons.check_circle_rounded,
         AppColors.verdePadrao,
       );
     } catch (error) {
-      FlushBarComponente.mostrar(
+      FlushBarComponent.mostrar(
         context,
         'Erro ao enviar o email. Tente novamente.',
         Icons.check_circle_rounded,
@@ -40,6 +40,12 @@ class ForgotPasswordViewModel extends ChangeNotifier {
 
   void clearFields() {
     emailController.clear();
-    notifyListeners(); // Notifica a view para que os campos sejam atualizados
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
   }
 }

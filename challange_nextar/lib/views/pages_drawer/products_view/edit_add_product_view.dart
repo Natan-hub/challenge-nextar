@@ -81,7 +81,7 @@ class _EditProductViewState extends State<EditProductView>
     final List<dynamic> allImages = [...product.images, ...product.localImages];
 
     return Scaffold(
-      appBar: AppBarComponente(
+      appBar: AppBarComponent(
         isTitulo: isEditing ? 'Editando Produto' : 'Novo Produto',
         isVoltar: true,
         actions: [

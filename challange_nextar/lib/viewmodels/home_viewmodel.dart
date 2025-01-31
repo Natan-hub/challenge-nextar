@@ -30,6 +30,7 @@ class HomeViewModel extends ChangeNotifier {
     _listenToSections();
   }
 
+  /// 📌Escuta mudanças no Firestore e atualiza as seções.
   void _listenToSections() {
     _homeService.listenToSections().listen((updatedSections) {
       _sections = updatedSections;
@@ -40,12 +41,14 @@ class HomeViewModel extends ChangeNotifier {
     });
   }
 
+  /// 📌Ativa o modo de edição.
   void enterEditing() {
     _editing = true;
     _editingSections = _sections.map((s) => s.copyWith()).toList();
     notifyListeners();
   }
 
+  /// 📌 Salva as alterações feitas durante a edição.
   Future<void> saveEditing() async {
     bool isValid = true;
 
@@ -89,17 +92,24 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addSection(HomeModel section) {
-    _editingSections.add(section);
+  ///📌 Adiciona uma nova seção à lista de edição.
+  void addSection(String type) {
+    _editingSections.add(HomeModel(
+        name: 'Nova Seção',
+        type: type,
+        items: [],
+        pos: _editingSections.length));
     notifyListeners();
   }
 
+  /// 📌Remove uma seção da lista de edição e do Firestore.
   void removeSection(HomeModel section) {
     _editingSections.remove(section);
     notifyListeners();
     _homeService.deleteSection(section);
   }
 
+  ///📌 Adiciona uma imagem a uma seção e faz o upload para o Firebase Storage.
   Future<void> addItemToSection(HomeModel section, File imageFile) async {
     try {
       String imageUrl = await _homeService.uploadImage(imageFile);
@@ -116,6 +126,7 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  /// 📌Remove um item da seção e do Firebase Storage, se necessário.
   Future<void> removeItem(HomeModel section, HomeItem item) async {
     int index = _editingSections.indexWhere((s) => s.name == section.name);
     if (index != -1) {
@@ -127,6 +138,7 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
+  /// 📌Atualiza um item dentro de uma seção.
   void updateItem(HomeModel section, HomeItem updatedItem) {
     int sectionIndex =
         _editingSections.indexWhere((s) => s.name == section.name);

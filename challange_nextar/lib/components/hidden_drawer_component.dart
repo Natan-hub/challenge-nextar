@@ -1,9 +1,9 @@
 import 'package:challange_nextar/utils/colors.dart';
 import 'package:challange_nextar/utils/styles.dart';
-import 'package:challange_nextar/views/pages_drawer/client_view.dart';
-import 'package:challange_nextar/views/pages_drawer/home_view.dart';
-import 'package:challange_nextar/views/pages_drawer/my_account_view.dart';
-import 'package:challange_nextar/views/pages_drawer/product_view.dart';
+import 'package:challange_nextar/views/pages_drawer/client_view/client_view.dart';
+import 'package:challange_nextar/views/pages_drawer/home_view/home_view.dart';
+import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_account_view.dart';
+import 'package:challange_nextar/views/pages_drawer/products_view/product_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
 
@@ -29,7 +29,7 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
           selectedStyle: drawerMenuSelectedStyle(),
           colorLineSelected: AppColors.primary2,
         ),
-        BaseView(),
+        HomeView(),
       ),
       ScreenHiddenDrawer(
         ItemHiddenMenu(
@@ -38,7 +38,7 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
           selectedStyle: drawerMenuSelectedStyle(),
           colorLineSelected: AppColors.primary2,
         ),
-        ProductView(),
+        const ProductView(),
       ),
       ScreenHiddenDrawer(
         ItemHiddenMenu(
@@ -47,16 +47,7 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
           selectedStyle: drawerMenuSelectedStyle(),
           colorLineSelected: AppColors.primary2,
         ),
-        ClientView(),
-      ),
-      ScreenHiddenDrawer(
-        ItemHiddenMenu(
-          name: 'Pedidos',
-          baseStyle: drawerMenuStyle(),
-          selectedStyle: drawerMenuSelectedStyle(),
-          colorLineSelected: AppColors.primary2,
-        ),
-        Placeholder(),
+        const ClientView(),
       ),
       ScreenHiddenDrawer(
         ItemHiddenMenu(
@@ -65,7 +56,7 @@ class _HiddenDrawerComponentState extends State<HiddenDrawerComponent> {
           selectedStyle: drawerMenuSelectedStyle(),
           colorLineSelected: AppColors.primary2,
         ),
-        MinhaConta(),
+        const MyAccountView(),
       ),
     ];
   }

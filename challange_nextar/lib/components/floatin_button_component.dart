@@ -67,6 +67,12 @@ class _FabMenuButtonState extends State<FabMenuButton>
           backgroundColor: AppColors.primary2,
           child: const Icon(Icons.add_rounded),
         ),
+        FloatingActionButton(
+          heroTag: "fab_delete",
+          onPressed: widget.onPressed3,
+          backgroundColor: AppColors.primary2,
+          child: const Icon(Icons.dele),
+        ),
       ],
     );
   }

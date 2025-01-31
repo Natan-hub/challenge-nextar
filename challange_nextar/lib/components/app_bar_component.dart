@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:challange_nextar/utils/styles.dart';
 import 'package:flutter/material.dart';
 
-class AppBarComponente extends StatelessWidget implements PreferredSizeWidget {
+class AppBarComponent extends StatelessWidget implements PreferredSizeWidget {
   final String isTitulo;
   final Widget? leading;
   final double appBarHeight;
@@ -11,7 +11,7 @@ class AppBarComponente extends StatelessWidget implements PreferredSizeWidget {
   final Color? color;
   final List<Widget>? actions;
 
-  const AppBarComponente({
+  const AppBarComponent({
     super.key,
     this.actions,
     this.leading,
