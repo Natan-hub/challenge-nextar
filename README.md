@@ -49,6 +49,33 @@ flutter run --release
 
 ## 🧠​ Sobre o projeto
 
+### 📌 Dependências do Projeto
+
+| **Dependência** | **Descrição** |
+|--------------|--------------|
+| `cupertino_icons` | Ícones do iOS para usar no Flutter. |
+| `firebase_core` | Inicializa o Firebase no app. Obrigatório para usar outros serviços Firebase. |
+| `firebase_auth` | Autenticação de usuários (e-mail, Google, Facebook, etc.). |
+| `firebase_storage` | Armazena e gerencia arquivos (imagens, PDFs, vídeos) na nuvem. |
+| `cloud_firestore` | Banco de dados NoSQL em tempo real do Firebase. |
+| `hidden_drawer_menu` | Cria um menu lateral oculto no app. |
+| `google_fonts` | Permite usar fontes personalizadas do Google no Flutter. |
+| `modal_bottom_sheet` | Exibe modais personalizados no estilo iOS e Android. |
+| `flutter_svg` | Suporte para imagens SVG no Flutter. |
+| `awesome_top_snackbar` | Exibe mensagens de notificação no topo da tela. |
+| `provider` | Gerenciamento de estado simples e eficiente para Flutter. |
+| `alphabet_scroll_view` | Lista com rolagem por letras (útil para listas ordenadas alfabeticamente). |
+| `faker` | Gera dados fictícios para testes (nomes, emails, etc.). |
+| `carousel_slider` | Cria carrosséis de imagens ou widgets. |
+| `flutter_native_splash` | Adiciona uma tela de splash personalizada ao iniciar o app. |
+| `animated_splash_screen` | Exibe uma tela de splash animada na inicialização. |
+| `flutter_staggered_grid_view` | Cria layouts de grade com tamanhos diferentes (como Pinterest). |
+| `image_picker` | Permite selecionar imagens da galeria ou câmera do dispositivo. |
+| `image_cropper` | Corta e edita imagens antes de enviá-las. |
+| `uuid` | Gera identificadores únicos (UUID) para objetos, como IDs de produtos. |
+| `babstrap_settings_screen` | Facilita a criação de telas de configurações no app. |
+| `shimmer` | Efeito de carregamento animado (Skeleton Loader). |
+| `cached_network_image` | Carrega e armazena em cache imagens da internet para melhor desempenho. |
 
 ## 🤝 Colaboradores
 
