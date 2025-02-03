@@ -13,7 +13,7 @@ class ProductViewModel extends ChangeNotifier {
   bool _isLoadingMore = false;
   bool _hasMoreProducts = true; // 📌Indica se há mais produtos para carregar
   bool _selectionMode = false; //📌 Indica se a seleção múltipla está ativada
-  bool shouldCloseDialog = false;
+
   Set<String> _selectedProducts = {};
 
   String? _selectedFilter;
@@ -41,19 +41,11 @@ class ProductViewModel extends ChangeNotifier {
 
     try {
       await _productService.saveProduct(product, isEditing);
-
-      // 🔥 Verifica se está editando ou adicionando e atualiza corretamente
-      if (isEditing) {
-        int index = _products.indexWhere((p) => p.id == product.id);
-        if (index != -1) {
-          _products[index] = product;
-        }
-      } else {
-        _products.add(product);
-      }
-
-      notifyListeners(); // 🔥 Atualiza a UI após salvar
+      _products = await _productService.getProducts();
+      successMessage =
+          isEditing ? "Produto atualizado!" : "Produto salvo com sucesso!";
     } catch (e) {
+      errorMessage = "Erro ao salvar produto.";
       debugPrint("Erro ao salvar produto: $e");
     } finally {
       _isSaving = false;
@@ -71,10 +63,7 @@ class ProductViewModel extends ChangeNotifier {
 
     try {
       await _productService.deleteProduct(product);
-
-      _products.removeWhere(
-          (p) => p.id == product.id); // 🔥 Remove da lista diretamente
-      notifyListeners(); // 🔥 Atualiza UI
+      _products = await _productService.getProducts();
     } catch (e) {
       debugPrint("Erro ao deletar produto: $e");
     } finally {
@@ -131,7 +120,7 @@ class ProductViewModel extends ChangeNotifier {
   }
 
   /// 📌Carrega o próximo lote de produtos do Firestore.
-  Future<void> _loadNextBatch() async {
+  Future<void> loadNextBatch() async {
     _isLoading = true;
     notifyListeners();
 
@@ -153,7 +142,10 @@ class ProductViewModel extends ChangeNotifier {
   }
 
   /// 📌Alterna o modo de seleção múltipla
+
   void toggleSelectionMode() {
+    if (_products.isEmpty) return;
+
     _selectionMode = !_selectionMode;
     _selectedProducts.clear();
     notifyListeners();
@@ -161,6 +153,8 @@ class ProductViewModel extends ChangeNotifier {
 
   /// 📌Alterna a seleção de um produto
   void toggleProductSelection(String productId) {
+    if (!_products.any((p) => p.id == productId)) return;
+
     if (_selectedProducts.contains(productId)) {
       _selectedProducts.remove(productId);
     } else {
@@ -175,20 +169,23 @@ class ProductViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      for (String productId in _selectedProducts) {
-        final product = _products.firstWhere((p) => p.id == productId);
-        await _productService.deleteProduct(product);
+      List<ProductModel> toDelete =
+          _products.where((p) => _selectedProducts.contains(p.id)).toList();
 
-        // Define mensagem de sucesso
-        successMessage = 'Produto deletado';
-        shouldCloseDialog = true;
+      for (final product in toDelete) {
+        await _productService.deleteProduct(product);
       }
 
-      await loadInitialProducts();
+      // Define mensagem de sucesso
+      successMessage = 'Produtos deletados com sucesso!';
+
+      // 🔹 Atualiza a lista de produtos após todas as exclusões
+      _products = await _productService.getProducts();
     } catch (e) {
       errorMessage = "Erro ao excluir produtos: $e.";
     } finally {
       _isSaving = false;
+
       notifyListeners();
     }
   }

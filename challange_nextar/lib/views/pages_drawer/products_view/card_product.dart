@@ -83,7 +83,7 @@ class ProductCardWidget extends StatelessWidget {
                             fit: BoxFit.cover,
                             width: double.infinity,
                           ),
-              
+
                           if (isSelected)
                             const Positioned(
                               top: 5,
@@ -93,7 +93,7 @@ class ProductCardWidget extends StatelessWidget {
                                 color: AppColors.primary,
                               ),
                             ),
-              
+
                           // 📌Exibe a faixa de "Sem Estoque" se o estoque for 0
                           if (product.stock == 0)
                             Positioned(
@@ -123,7 +123,7 @@ class ProductCardWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-              
+
                   // 📌Título do Produto
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -135,10 +135,11 @@ class ProductCardWidget extends StatelessWidget {
                       style: normalTextStyleBold(Colors.black),
                     ),
                   ),
-              
+
                   // 📌Informações adicionais
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

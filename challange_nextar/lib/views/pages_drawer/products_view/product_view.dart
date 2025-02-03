@@ -27,34 +27,40 @@ class _ProductViewState extends State<ProductView> {
     super.initState();
     viewModel = context.read<ProductViewModel>();
 
-    viewModel.addListener(() {
-      if (viewModel.successMessage != null) {
-        FlushBarWidget.mostrar(
-          context,
-          viewModel.successMessage!,
-          Icons.check_circle_rounded,
-          AppColors.verdePadrao,
-        );
-      }
-
-      if (viewModel.errorMessage != null) {
-        FlushBarWidget.mostrar(
-          context,
-          viewModel.errorMessage!,
-          Icons.warning_amber,
-          AppColors.vermelhoPadrao,
-        );
-      }
-
-      if (viewModel.shouldCloseDialog) {
-        Navigator.pop(context);
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel.loadInitialProducts();
     });
+
+    viewModel.addListener(_handleViewModelChanges);
+  }
+
+  void _handleViewModelChanges() {
+    if (viewModel.successMessage != null) {
+      FlushBarWidget.mostrar(
+        context,
+        viewModel.successMessage!,
+        Icons.check_circle_rounded,
+        AppColors.verdePadrao,
+      );
+
+      viewModel.successMessage = null;
+    }
+
+    if (viewModel.errorMessage != null) {
+      FlushBarWidget.mostrar(
+        context,
+        viewModel.errorMessage!,
+        Icons.warning_amber,
+        AppColors.vermelhoPadrao,
+      );
+
+      viewModel.errorMessage = null;
+    }
   }
 
   @override
   void dispose() {
-    viewModel.removeListener(() {});
+    viewModel.removeListener(_handleViewModelChanges);
     super.dispose();
   }
 
@@ -187,7 +193,7 @@ class _ProductViewState extends State<ProductView> {
           ),
           const SizedBox(height: 20),
           Text(
-            "Nenhum produto criado, \nclique no botão inferior direito e adicione.",
+            "Nenhum produto criado, clique no botão inferior direito e adicione.",
             style: principalTextStyle(),
           ),
           const SizedBox(height: 20),
@@ -211,6 +217,7 @@ class _ProductViewState extends State<ProductView> {
           TextButton(
             onPressed: () {
               viewModel.deleteSelectedProducts();
+              Navigator.pop(context);
             },
             child: const Text("Excluir", style: TextStyle(color: Colors.red)),
           ),

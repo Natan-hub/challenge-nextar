@@ -71,7 +71,7 @@ class EditProductView extends StatelessWidget with ValidacoesMixin {
                     maxLength: 7,
                   ),
                   const SizedBox(height: 15),
-                  _buildBiggerTextForm(context),
+                  _buildBiggerTextForm(context, viewModel),
                   const SizedBox(height: 15),
                   _buildTextField(
                     label: "Estoque",
@@ -107,9 +107,13 @@ class EditProductView extends StatelessWidget with ValidacoesMixin {
                           : () async {
                               bool success = await viewModel.saveProduct();
                               if (success) {
-                                Navigator.pop(context);
+                                if (viewModel.isEditing) {
+                                  Navigator.pop(context);
 
-                                Navigator.pop(context);
+                                  Navigator.pop(context);
+                                } else {
+                                  Navigator.pop(context);
+                                }
 
                                 FlushBarWidget.mostrar(
                                   context,
@@ -222,12 +226,13 @@ class EditProductView extends StatelessWidget with ValidacoesMixin {
 
   Widget _buildBiggerTextForm(
     BuildContext context,
+    EditAddProductViewModel viewModel,
   ) {
     return TextFormField(
       validator: (val) => combine([
         () => isNotEmpty(val, context),
       ]),
-      onSaved: (text) => product?.description = text!,
+      onSaved: (text) => viewModel.product.description = text!,
       initialValue: product?.description,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       maxLength: 5000,

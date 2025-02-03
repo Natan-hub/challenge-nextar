@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
-  HomeView({super.key});
+  const HomeView({super.key});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -22,18 +22,17 @@ class _HomeViewState extends State<HomeView> {
   final ImagePicker picker = ImagePicker();
 
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  // Garante que os produtos sejam carregados ao entrar na tela
-  Future.microtask(() {
-    final productViewModel = context.read<ProductViewModel>();
-    if (productViewModel.products.isEmpty) {
-      productViewModel.loadInitialProducts();
-    }
-  });
-}
-
+    // Garante que os produtos sejam carregados ao entrar na tela
+    Future.microtask(() {
+      final productViewModel = context.read<ProductViewModel>();
+      if (productViewModel.products.isEmpty) {
+        productViewModel.loadInitialProducts();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
