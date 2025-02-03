@@ -43,7 +43,7 @@ class ForgotPasswordStateView extends State<ForgotPasswordView>
           context,
           viewModel.errorMessage!,
           Icons.error_outline,
-          Colors.red,
+          AppColors.vermelhoPadrao,
         );
       });
     }

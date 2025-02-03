@@ -164,7 +164,8 @@ class _DetailsProductState extends State<DetailsProduct> {
       children: [
         Text('A partir de', style: subTextStyle()),
         const SizedBox(height: 5),
-        Text(widget.product.price, style: priceDetaildProductTextStyle()),
+        Text('R\$ ${widget.product.price}',
+            style: priceDetaildProductTextStyle()),
       ],
     );
   }

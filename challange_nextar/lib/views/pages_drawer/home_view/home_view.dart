@@ -1,6 +1,7 @@
 import 'package:challange_nextar/core/theme/colors.dart';
 import 'package:challange_nextar/core/theme/images.dart';
 import 'package:challange_nextar/core/theme/styles.dart';
+import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
 import 'package:challange_nextar/viewmodels/home_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:challange_nextar/views/pages_drawer/home_view/section_view.dart';
@@ -69,29 +70,44 @@ class HomeView extends StatelessWidget {
             ),
           ),
           floatingActionButton: Consumer<HomeViewModel>(
-            builder: (_, homeManager, __) => FloatingActionButton(
-              backgroundColor: AppColors.primary2,
-              onPressed: homeManager.editing ? null : homeManager.enterEditing,
-              child: homeManager.editing
-                  ? PopupMenuButton<String>(
-                      onSelected: (e) => e == 'Salvar'
-                          ? homeManager.saveEditing()
-                          : homeManager.discardEditing(),
-                      itemBuilder: (_) => ['Salvar', 'Descartar']
-                          .map(
-                            (e) => PopupMenuItem(
-                              value: e,
-                              child: Text(e),
-                            ),
-                          )
-                          .toList(),
-                      icon: const Icon(Icons.more_vert, color: Colors.white),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    )
-                  : const Icon(Icons.edit_rounded),
-            ),
+            builder: (context, homeManager, __) {
+              if (homeManager.error != null) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  FlushBarWidget.mostrar(
+                    context,
+                    homeManager.error!,
+                    Icons.error_outline,
+                    AppColors.vermelhoPadrao,
+                  );
+                  homeManager.error = null;
+                });
+              }
+
+              return FloatingActionButton(
+                backgroundColor: AppColors.primary2,
+                onPressed:
+                    homeManager.editing ? null : homeManager.enterEditing,
+                child: homeManager.editing
+                    ? PopupMenuButton<String>(
+                        onSelected: (e) => e == 'Salvar'
+                            ? homeManager.saveEditing()
+                            : homeManager.discardEditing(),
+                        itemBuilder: (_) => ['Salvar', 'Descartar']
+                            .map(
+                              (e) => PopupMenuItem(
+                                value: e,
+                                child: Text(e),
+                              ),
+                            )
+                            .toList(),
+                        icon: const Icon(Icons.more_vert, color: Colors.white),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      )
+                    : const Icon(Icons.edit_rounded),
+              );
+            },
           ),
         ));
   }

@@ -57,15 +57,18 @@ class HomeViewModel extends ChangeNotifier {
   /// 📌 Salva as alterações feitas durante a edição.
   Future<void> saveEditing() async {
     bool isValid = true;
+    String? validationError;
 
     for (final section in _editingSections) {
       if (!section.valid()) {
         isValid = false;
+        validationError = section.error;
+        break;
       }
     }
 
     if (!isValid) {
-      error = "Erro ao salvar. Verifique os campos!";
+      error = validationError;
       notifyListeners();
       return;
     }

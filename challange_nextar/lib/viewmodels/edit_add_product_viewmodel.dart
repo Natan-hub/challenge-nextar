@@ -15,6 +15,9 @@ class EditAddProductViewModel extends ChangeNotifier {
   bool isEditing = false;
   bool isSaving = false;
   int currentIndex = 0;
+  String? _error;
+
+  String? get error => _error;
 
   EditAddProductViewModel(
       [this.productViewModel, ProductModel? initialProduct]) {
@@ -35,17 +38,44 @@ class EditAddProductViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> saveProduct() async {
+  set error(String? value) {
+    _error = value;
+    notifyListeners();
+  }
+
+  bool validateProduct() {
     if (!formKey.currentState!.validate()) return false;
     formKey.currentState!.save();
+
+    if (product.images.isEmpty && product.localImages.isEmpty) {
+      error = "Adicione pelo menos uma imagem ao produto.";
+      return false;
+    }
+
+    error = null;
+    return true;
+  }
+
+  Future<bool> saveProduct() async {
+    if (!validateProduct()) {
+      notifyListeners();
+      return false;
+    }
 
     isSaving = true;
     notifyListeners();
 
-    await productViewModel?.saveProduct(product, isEditing);
-
-    isSaving = false;
-    notifyListeners();
+    try {
+      await productViewModel?.saveProduct(product, isEditing);
+    } catch (e) {
+      debugPrint("Erro ao salvar produto: $e");
+      error = "Erro ao salvar o produto. Tente novamente.";
+      notifyListeners();
+      return false;
+    } finally {
+      isSaving = false;
+      notifyListeners();
+    }
 
     return true;
   }

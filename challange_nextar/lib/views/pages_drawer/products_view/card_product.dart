@@ -49,113 +49,114 @@ class ProductCardWidget extends StatelessWidget {
         elevation: 3,
         child: Stack(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 📌Imagem do Produto com sobreposição para "Sem Estoque"
-                SizedBox(
-                  height: 200,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                    ),
-                    child: Stack(
-                      children: [
-                        CachedNetworkImage(
-                          imageUrl: product.images.first,
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) => Center(
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(
-                                value: downloadProgress.progress,
-                                strokeWidth: 3,
+            IntrinsicHeight(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 📌Imagem do Produto com sobreposição para "Sem Estoque"
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                      child: Stack(
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl: product.images.first,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) => Center(
+                              child: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: CircularProgressIndicator(
+                                  value: downloadProgress.progress,
+                                  strokeWidth: 3,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => const Icon(
+                              Icons.error,
+                              color: AppColors.vermelhoPadrao,
+                            ),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
+              
+                          if (isSelected)
+                            const Positioned(
+                              top: 5,
+                              right: 5,
+                              child: Icon(
+                                Icons.check_circle,
                                 color: AppColors.primary,
                               ),
                             ),
-                          ),
-                          errorWidget: (context, url, error) => const Icon(
-                            Icons.error,
-                            color: AppColors.vermelhoPadrao,
-                          ),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
-
-                        if (isSelected)
-                          const Positioned(
-                            top: 5,
-                            right: 5,
-                            child: Icon(
-                              Icons.check_circle,
-                              color: AppColors.primary,
-                            ),
-                          ),
-
-                        // 📌Exibe a faixa de "Sem Estoque" se o estoque for 0
-                        if (product.stock == 0)
-                          Positioned(
-                            top: 50,
-                            left: 0,
-                            right: 0,
-                            child: Transform.rotate(
-                              angle: -0.7,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                  horizontal: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary2,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'SEM ESTOQUE',
-                                  textAlign: TextAlign.center,
-                                  style: normalTextStyleBold(Colors.white),
+              
+                          // 📌Exibe a faixa de "Sem Estoque" se o estoque for 0
+                          if (product.stock == 0)
+                            Positioned(
+                              top: 50,
+                              left: 0,
+                              right: 0,
+                              child: Transform.rotate(
+                                angle: -0.7,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary2,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    'SEM ESTOQUE',
+                                    textAlign: TextAlign.center,
+                                    style: normalTextStyleBold(Colors.white),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              
+                  // 📌Título do Produto
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    child: Text(
+                      product.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: normalTextStyleBold(Colors.black),
+                    ),
+                  ),
+              
+                  // 📌Informações adicionais
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'R\$ ${product.price}',
+                          style: subTextStyle(),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'em até 10x sem juros',
+                          style: subTextStyle(),
+                        ),
+                        const SizedBox(height: 4),
                       ],
                     ),
                   ),
-                ),
-
-                // 📌Título do Produto
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 4.0),
-                  child: Text(
-                    product.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: normalTextStyleBold(Colors.black),
-                  ),
-                ),
-
-                // 📌Informações adicionais
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'R\$ ${product.price}',
-                        style: subTextStyle(),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'em até 10x sem juros',
-                        style: subTextStyle(),
-                      ),
-                      const SizedBox(height: 4),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

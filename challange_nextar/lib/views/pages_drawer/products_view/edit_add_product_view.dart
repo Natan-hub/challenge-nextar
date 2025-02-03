@@ -77,28 +77,41 @@ class EditProductView extends StatelessWidget with ValidacoesMixin {
                     ]),
                   ),
                   const SizedBox(height: 20),
-                  DefaultButton(
-                    borderRadius: BorderRadius.circular(10),
-                    cor: AppColors.corBotao,
-                    padding: const EdgeInsets.fromLTRB(115, 20, 115, 20),
-                    nomeBotao: 'Salvar',
-                    onPressed: viewModel.isSaving
-                        ? null
-                        : () async {
-                            bool success = await viewModel.saveProduct();
-                            if (success) {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
+                  Consumer<EditAddProductViewModel>(
+                      builder: (context, productManager, __) {
+                    if (productManager.error != null) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        FlushBarWidget.mostrar(
+                          context,
+                          productManager.error!,
+                          Icons.error_outline,
+                          AppColors.vermelhoPadrao,
+                        );
+                        productManager.error = null;
+                      });
+                    }
+                    return DefaultButton(
+                      borderRadius: BorderRadius.circular(10),
+                      cor: AppColors.corBotao,
+                      padding: const EdgeInsets.fromLTRB(115, 20, 115, 20),
+                      nomeBotao: 'Salvar',
+                      onPressed: viewModel.isSaving
+                          ? null
+                          : () async {
+                              bool success = await viewModel.saveProduct();
+                              if (success) {
+                                Navigator.pop(context);
 
-                              FlushBarWidget.mostrar(
-                                context,
-                                'Produto salvo com sucesso!',
-                                Icons.check_circle_rounded,
-                                AppColors.verdePadrao,
-                              );
-                            }
-                          },
-                  ),
+                                FlushBarWidget.mostrar(
+                                  context,
+                                  'Produto salvo com sucesso!',
+                                  Icons.check_circle_rounded,
+                                  AppColors.verdePadrao,
+                                );
+                              }
+                            },
+                    );
+                  }),
                 ],
               ),
             ),
