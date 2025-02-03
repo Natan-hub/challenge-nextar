@@ -196,11 +196,30 @@ class ProductViewModel extends ChangeNotifier {
       } else if (filter == 'Ordem Alfabética') {
         _products.sort((a, b) => a.name.compareTo(b.name));
       } else if (filter == 'Preço: Mais barato') {
-        _products.sort(
-            (a, b) => double.parse(a.price).compareTo(double.parse(b.price)));
+        _products.sort((a, b) {
+          double priceA = _convertToDouble(a.price);
+          double priceB = _convertToDouble(b.price);
+          return priceA.compareTo(priceB);
+        });
       }
     }
     notifyListeners();
+  }
+
+  double _convertToDouble(String? price) {
+    if (price == null || price.trim().isEmpty) return 0.0;
+
+    // Remove qualquer espaço extra
+    String cleanedPrice = price.trim();
+
+    // Verifica se o preço está no formato "4.700,00"
+    if (cleanedPrice.contains('.') && cleanedPrice.contains(',')) {
+      cleanedPrice = cleanedPrice.replaceAll('.', '').replaceAll(',', '.');
+    } else if (cleanedPrice.contains(',')) {
+      cleanedPrice = cleanedPrice.replaceAll(',', '.');
+    }
+
+    return double.tryParse(cleanedPrice) ?? 0.0;
   }
 
   /// 📌Busca um produto pelo ID.

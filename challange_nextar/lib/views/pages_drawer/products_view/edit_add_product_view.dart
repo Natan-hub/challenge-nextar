@@ -7,11 +7,13 @@ import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
 import 'package:challange_nextar/core/widgets/botao_widget.dart';
 import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
 import 'package:challange_nextar/core/widgets/form_field_widget.dart';
+import 'package:challange_nextar/helper/formater_helper.dart';
 import 'package:challange_nextar/models/product_model.dart';
 import 'package:challange_nextar/utils/validators/validacoes_mixin.dart';
 import 'package:challange_nextar/viewmodels/edit_add_product_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -60,8 +62,13 @@ class EditProductView extends StatelessWidget with ValidacoesMixin {
                     onSaved: (text) => viewModel.product.price = text!,
                     validator: (text) => combine([
                       () => isNotEmpty(text, context),
-                      () => isNotZero(text, context),
+                      () => isGreaterThanZero(text, context),
                     ]),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      CurrencyPtBrInputFormatter()
+                    ],
+                    maxLength: 7,
                   ),
                   const SizedBox(height: 15),
                   _buildBiggerTextForm(context),
@@ -255,6 +262,8 @@ Widget _buildTextField(
     {required String label,
     String? initialValue,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    int? maxLength,
     String? Function(String?)? validator,
     required Function(String?) onSaved}) {
   return FormFieldWidget(
@@ -265,5 +274,7 @@ Widget _buildTextField(
     hintText: '',
     padding: EdgeInsets.zero,
     validator: validator,
+    maxLength: maxLength,
+    inputFormatters: inputFormatters,
   );
 }

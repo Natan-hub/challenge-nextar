@@ -52,6 +52,17 @@ mixin ValidacoesMixin {
     return null;
   }
 
+  String? isGreaterThanZero(String? value, [BuildContext? context]) {
+    double local = double.parse(
+      value!.replaceAll(".", "").replaceAll(",", "."),
+    );
+    if (local <= 0) {
+      return "O valor deve ser maior que zero";
+    }
+
+    return null;
+  }
+
   String? combine(List<String? Function()> validators) {
     for (final func in validators) {
       final validation = func();
