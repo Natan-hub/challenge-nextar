@@ -47,6 +47,13 @@ flutter run --release
 - Com o debug podemos ver os logs, e ter acesso a ferramentas de depuração.
 - Com o release executamos a versão final do app com otimizações, sem logs e hot-reload.
 
+## 🚀 APK do projeto para baixar
+<a href="https://github.com/Natan-hub/challenge-nextar/raw/main/app-release.apk" download>
+  <img src="https://img.shields.io/badge/Baixar%20APK-Download-blue?style=for-the-badge">
+</a>
+
+
+
 ## 🧠​ Sobre o projeto
 
 - Para fazer login e acessar a home:
