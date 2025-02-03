@@ -1,5 +1,8 @@
 import 'package:alphabet_scroll_view/alphabet_scroll_view.dart';
-import 'package:challange_nextar/utils/colors.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:challange_nextar/core/widgets/shimmer_loading_widget.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:challange_nextar/viewmodels/client_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +19,6 @@ class _ClientViewState extends State<ClientView> {
   void initState() {
     super.initState();
 
-    // Chama a função para listar clientes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ClientViewModel>(context, listen: false).listClients();
     });
@@ -28,9 +30,8 @@ class _ClientViewState extends State<ClientView> {
 
     return Scaffold(
       body: clientViewModel.clients.isEmpty
-          ? const Center(
-              child:
-                  CircularProgressIndicator(), // Exibe um indicador de carregamento enquanto a lista está vazia
+          ? Center(
+              child: shimerColor(context),
             )
           : AlphabetScrollView(
               list: clientViewModel.clients
@@ -82,26 +83,32 @@ class _ClientViewState extends State<ClientView> {
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
-                        child: Image.network(
-                          cliente.perfil,
+                        child: CachedNetworkImage(
+                          imageUrl: cliente.perfil,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) =>
+                                  CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                            color: AppColors.primary,
+                          ),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                            color: AppColors.vermelhoPadrao,
+                          ),
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.error,
-                              color: AppColors.vermelhoPadrao,
-                            );
-                          },
                         ),
                       ),
                       title: Text(
                         cliente.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: normalTextStyleDefault(Colors.black),
                       ),
                       subtitle: Text(
                         cliente.email,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: subTextStyle(),
                       ),
                     ),
                   ),

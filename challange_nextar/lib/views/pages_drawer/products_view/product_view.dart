@@ -1,9 +1,13 @@
-import 'package:challange_nextar/components/floatin_button_component.dart';
-import 'package:challange_nextar/routes/pages.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
-import 'package:challange_nextar/utils/styles.dart';
+import 'package:challange_nextar/core/widgets/floatin_button_widget.dart';
+import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/native_dialog_widget.dart';
+import 'package:challange_nextar/core/widgets/shimmer_loading_widget.dart';
+import 'package:challange_nextar/routes/routes.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
+import 'package:challange_nextar/views/pages_drawer/products_view/card_product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +20,43 @@ class ProductView extends StatefulWidget {
 }
 
 class _ProductViewState extends State<ProductView> {
-  final Set<String> _selectedProducts = {}; // Armazena os produtos selecionados
+  late ProductViewModel viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    viewModel = context.read<ProductViewModel>();
+
+    viewModel.addListener(() {
+      if (viewModel.successMessage != null) {
+        FlushBarWidget.mostrar(
+          context,
+          viewModel.successMessage!,
+          Icons.check_circle_rounded,
+          AppColors.verdePadrao,
+        );
+      }
+
+      if (viewModel.errorMessage != null) {
+        FlushBarWidget.mostrar(
+          context,
+          viewModel.errorMessage!,
+          Icons.warning_amber,
+          AppColors.vermelhoPadrao,
+        );
+      }
+
+      if (viewModel.shouldCloseDialog) {
+        Navigator.pop(context);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    viewModel.removeListener(() {});
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +68,7 @@ class _ProductViewState extends State<ProductView> {
               if (scrollInfo.metrics.pixels ==
                       scrollInfo.metrics.maxScrollExtent &&
                   productViewModel.hasMoreProducts &&
-                  !productViewModel.isLoading) {
+                  !productViewModel.isLoadingMore) {
                 productViewModel.loadMoreProducts();
               }
               return false;
@@ -44,16 +84,19 @@ class _ProductViewState extends State<ProductView> {
             onPressed2: () async {
               await Navigator.pushNamed(context, Routes.editAddProduct);
             },
+            onPressed3: productViewModel.selectedProducts.isNotEmpty
+                ? () => _confirmDelete(context, productViewModel)
+                : () => _warningSelect(context),
           );
         },
       ),
     );
   }
 
-  /// Constrói o corpo principal da tela
+  /// 📌Constrói o corpo principal da tela
   Widget _buildBody(ProductViewModel productViewModel) {
     if (productViewModel.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: shimerColor(context));
     }
 
     if (productViewModel.products.isEmpty) {
@@ -73,136 +116,17 @@ class _ProductViewState extends State<ProductView> {
         ),
         itemBuilder: (context, index) {
           if (index == productViewModel.products.length) {
-            return const Center(child: CircularProgressIndicator());
+            return productViewModel.isLoadingMore
+                ? const Center(child: CircularProgressIndicator())
+                : const SizedBox.shrink();
           }
 
           final product = productViewModel.products[index];
-          return _buildProductCard(context, product);
+          return ProductCardWidget(
+            product: product,
+            productViewModel: productViewModel,
+          );
         },
-      ),
-    );
-  }
-
-  Widget _buildProductCard(context, product) {
-    final bool isSelected = _selectedProducts.contains(product.id);
-
-    return InkWell(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          Routes.detailsProduct,
-          arguments: {
-            'product': product,
-          },
-        );
-      },
-      onLongPress: () {
-        setState(() {
-          if (_selectedProducts.contains(product.id)) {
-            _selectedProducts.remove(product.id);
-          } else {
-            _selectedProducts.add(product.id);
-          }
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        elevation: 3,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 📌Imagem do Produto com sobreposição para "Sem Estoque"
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                    ),
-                    child: Stack(
-                      children: [
-                        Image.network(
-                          product.images.first,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.image_not_supported,
-                              size: 50,
-                              color: Colors.grey,
-                            );
-                          },
-                        ),
-
-                        // Exibe a faixa de "Sem Estoque" se o estoque for 0
-                        if (product.stock == 0)
-                          Positioned(
-                            top: 50,
-                            left: 0,
-                            right: 0,
-                            child: Transform.rotate(
-                              angle: -0.7, // Inclinação da faixa
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                  horizontal: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary2,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'SEM ESTOQUE',
-                                  textAlign: TextAlign.center,
-                                  style: normalTextStyleBold(Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Título do Produto
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 4.0),
-                  child: Text(
-                    product.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: normalTextStyleBold(Colors.black),
-                  ),
-                ),
-
-                // Informações adicionais
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'R\$ ${product.price}',
-                        style: subTextStyle(),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'em até 10x sem juros',
-                        style: subTextStyle(),
-                      ),
-                      const SizedBox(height: 4),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-             if (isSelected) _buildSelectionOverlay(),
-          ],
-        ),
       ),
     );
   }
@@ -263,7 +187,7 @@ class _ProductViewState extends State<ProductView> {
           ),
           const SizedBox(height: 20),
           Text(
-            "Nenhum produto criado, clique no botão '+' e adicione.",
+            "Nenhum produto criado, clique no botão inferior direito e adicione.",
             style: principalTextStyle(),
           ),
           const SizedBox(height: 20),
@@ -272,69 +196,35 @@ class _ProductViewState extends State<ProductView> {
     );
   }
 
-    /// Exibe a sobreposição quando o produto está selecionado
-  Widget _buildSelectionOverlay() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const Center(
-        child: Icon(Icons.check_circle, color: Colors.white, size: 40),
-      ),
-    );
-  }
-
-  /// Exibe o botão de excluir quando há produtos selecionados
-  Widget? _buildFloatingActionButton() {
-    if (_selectedProducts.isNotEmpty) {
-      return FloatingActionButton(
-        onPressed: _confirmDelete,
-        backgroundColor: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
-      );
-    }
-    return null;
-  }
-
-  /// Mostra um diálogo de confirmação para exclusão
-  void _confirmDelete() {
+  /// Exibe um alerta de confirmação para excluir os produtos selecionados
+  void _confirmDelete(BuildContext context, ProductViewModel viewModel) {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Excluir produtos"),
-          content: Text("Tem certeza que deseja excluir ${_selectedProducts.length} produto(s)?"),
-          actions: [
-            TextButton(
+      builder: (context) => AlertDialog(
+        title: const Text("Excluir produtos?"),
+        content: const Text(
+            "Tem certeza que deseja excluir os produtos selecionados?"),
+        actions: [
+          TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancelar"),
-            ),
-            TextButton(
-              onPressed: () {
-                _deleteSelectedProducts();
-                Navigator.pop(context);
-              },
-              child: const Text("Excluir", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
+              child: const Text("Cancelar")),
+          TextButton(
+            onPressed: () {
+              viewModel.deleteSelectedProducts();
+            },
+            child: const Text("Excluir", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 
-  /// Exclui os produtos selecionados
-  void _deleteSelectedProducts() {
-    final productViewModel = context.read<ProductViewModel>();
-
-    for (final productId in _selectedProducts) {
-      final product = productViewModel.products.firstWhere((p) => p.id == productId);
-      productViewModel.deleteProduct(product);
-    }
-
-    setState(() {
-      _selectedProducts.clear();
-    });
+  void _warningSelect(BuildContext context) {
+    NativeDialog.showAlert(
+      context: context,
+      title: "Aviso!",
+      message: 'Você deve selecionar um produto antes.',
+      confirmButtonText: "Ok",
+    );
   }
-
 }

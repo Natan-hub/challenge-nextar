@@ -1,22 +1,26 @@
-import 'package:challange_nextar/components/app_bar_component.dart';
-import 'package:challange_nextar/components/botao_component.dart';
-import 'package:challange_nextar/components/form_field_component.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/botao_widget.dart';
+import 'package:challange_nextar/core/widgets/form_field_widget.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
+import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
-class MeusDados extends StatelessWidget {
-  const MeusDados({
+class MyDataView extends StatelessWidget {
+  const MyDataView({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final viewModelLogin = context.watch<LoginViewModel>();
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-          appBar: const AppBarComponent(
+          appBar: const AppBarWidget(
             isTitulo: "Modificar meus dados",
           ),
           body: SafeArea(
@@ -34,20 +38,21 @@ class MeusDados extends StatelessWidget {
                             AppImages.profile,
                           ),
                         ),
-                        const FormFieldComponent(
+                        FormFieldWidget(
                           maxLength: 250,
-                          padding: EdgeInsets.symmetric(horizontal: 18),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
                           textInputAction: TextInputAction.next,
-                          prefixIcon: Icon(
+                          prefixIcon: const Icon(
                             Icons.account_circle,
                             color: AppColors.primary,
                           ),
                           labelText: "Nome",
                           hintText: "Ex: João",
                           obscureText: false,
+                          initialValue: viewModelLogin.dataUser!.name,
                         ),
                         const SizedBox(height: 15),
-                        const FormFieldComponent(
+                        const FormFieldWidget(
                           maxLength: 250,
                           padding: EdgeInsets.symmetric(horizontal: 18),
                           textInputAction: TextInputAction.done,
@@ -64,7 +69,7 @@ class MeusDados extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  botaoAlterarDados(context),
+                  _buildButton(context),
                   const SizedBox(height: 15),
                 ],
               ),
@@ -73,7 +78,7 @@ class MeusDados extends StatelessWidget {
     );
   }
 
-  Widget botaoAlterarDados(BuildContext context) {
+  Widget _buildButton(BuildContext context) {
     return DefaultButton(
       borderRadius: BorderRadius.circular(10),
       nomeBotao: "Alterar dados",

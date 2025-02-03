@@ -1,5 +1,5 @@
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/styles.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:challange_nextar/views/pages_drawer/client_view/client_view.dart';
 import 'package:challange_nextar/views/pages_drawer/home_view/home_view.dart';
 import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_account_view.dart';

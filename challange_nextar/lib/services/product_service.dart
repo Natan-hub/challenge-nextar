@@ -18,47 +18,59 @@ class ProductService {
   /// Salva um produto no Firestore. Se for edição, atualiza o documento existente.
   Future<void> saveProduct(ProductModel product, bool isEditing) async {
     try {
-      final List<String> updatedImages =
-          List.from(product.images); // Mantém URLs já existentes
+      // 🔹 Atualiza a lista de imagens do produto
+      final List<String> updatedImages = await _processImages(product);
 
-      // Faz upload das imagens locais
-      for (final file in product.localImages) {
-        String imageUrl = await _uploadImage(file, product.id);
-        updatedImages.add(imageUrl);
-      }
-
-      // Se for edição, deleta imagens antigas removidas pelo usuário
+      // 🔹 Se for edição, remove imagens antigas que foram excluídas
       if (isEditing) {
-        DocumentSnapshot doc =
-            await _firestore.collection('products').doc(product.id).get();
-        if (doc.exists) {
-          List<String> oldImages = List<String>.from(doc['images'] ?? []);
-          for (final oldImage in oldImages) {
-            if (!updatedImages.contains(oldImage)) {
-              await _deleteImageFromStorage(oldImage);
-            }
-          }
-        }
+        await _removeOldImages(product.id, updatedImages);
       }
 
-      // Atualiza o produto com as novas imagens
-      product.images = updatedImages;
-      product.localImages
-          .clear(); // ⚠️ Limpa a lista de imagens locais após o upload
+      // 🔹 Criamos um novo objeto ProductModel com as imagens atualizadas
+      ProductModel updatedProduct = product.copyWith(images: updatedImages);
 
-      if (isEditing) {
-        await _firestore
-            .collection('products')
-            .doc(product.id)
-            .update(product.toMap());
-      } else {
-        await _firestore
-            .collection('products')
-            .doc(product.id)
-            .set(product.toMap());
-      }
+      // 🔹 Salva ou atualiza no Firestore
+      await _saveToFirestore(updatedProduct, isEditing);
     } catch (e) {
       throw Exception("Erro ao salvar produto: $e");
+    }
+  }
+
+  /// 🔹 Faz upload das imagens locais e mantém as já existentes
+  Future<List<String>> _processImages(ProductModel product) async {
+    List<String> updatedImages = List.from(product.images);
+
+    for (final file in product.localImages) {
+      String imageUrl = await _uploadImage(file, product.id);
+      updatedImages.add(imageUrl);
+    }
+
+    return updatedImages;
+  }
+
+  /// 🔹 Remove imagens antigas que não estão mais no produto
+  Future<void> _removeOldImages(
+      String productId, List<String> updatedImages) async {
+    DocumentSnapshot doc =
+        await _firestore.collection('products').doc(productId).get();
+
+    if (doc.exists) {
+      List<String> oldImages = List<String>.from(doc['images'] ?? []);
+      for (final oldImage in oldImages) {
+        if (!updatedImages.contains(oldImage)) {
+          await _deleteImageFromStorage(oldImage);
+        }
+      }
+    }
+  }
+
+  /// 🔹 Salva ou atualiza o produto no Firestore
+  Future<void> _saveToFirestore(ProductModel product, bool isEditing) async {
+    final docRef = _firestore.collection('products').doc(product.id);
+    if (isEditing) {
+      await docRef.update(product.toMap());
+    } else {
+      await docRef.set(product.toMap());
     }
   }
 

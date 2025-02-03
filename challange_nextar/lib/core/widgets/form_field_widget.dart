@@ -1,9 +1,9 @@
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/styles.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class FormFieldComponent extends StatelessWidget {
+class FormFieldWidget extends StatelessWidget {
   final TextEditingController? controller;
   final String labelText;
   final String? initialValue;
@@ -24,7 +24,7 @@ class FormFieldComponent extends StatelessWidget {
   final Color? fillColor;
   final int? maxLength;
 
-  const FormFieldComponent({
+  const FormFieldWidget({
     super.key,
     this.textInputAction,
     this.maxLength,

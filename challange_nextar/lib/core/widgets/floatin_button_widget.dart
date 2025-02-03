@@ -1,14 +1,16 @@
-import 'package:challange_nextar/utils/colors.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class FabMenuButton extends StatefulWidget {
   final Function() onPressed;
   final Function() onPressed2;
+  final dynamic onPressed3;
 
   const FabMenuButton({
     super.key,
     required this.onPressed,
     required this.onPressed2,
+    required this.onPressed3,
   });
 
   @override
@@ -71,7 +73,7 @@ class _FabMenuButtonState extends State<FabMenuButton>
           heroTag: "fab_delete",
           onPressed: widget.onPressed3,
           backgroundColor: AppColors.primary2,
-          child: const Icon(Icons.dele),
+          child: const Icon(Icons.delete_rounded),
         ),
       ],
     );

@@ -18,6 +18,7 @@ class HomeViewModel extends ChangeNotifier {
 
   bool get editing => _editing;
   bool get loading => _loading;
+  bool isUploading = false;
 
   List<HomeModel> get sections => _editing ? _editingSections : _sections;
 
@@ -30,12 +31,17 @@ class HomeViewModel extends ChangeNotifier {
     _listenToSections();
   }
 
+  void setUploading(bool value) {
+    isUploading = value;
+    notifyListeners();
+  }
+
   /// 📌Escuta mudanças no Firestore e atualiza as seções.
   void _listenToSections() {
     _homeService.listenToSections().listen((updatedSections) {
       _sections = updatedSections;
       if (!_editing) {
-        _editingSections = _sections.map((s) => s.copyWith()).toList();
+        _editingSections = _sections.map((s) => s).toList();
       }
       notifyListeners();
     });
@@ -44,7 +50,7 @@ class HomeViewModel extends ChangeNotifier {
   /// 📌Ativa o modo de edição.
   void enterEditing() {
     _editing = true;
-    _editingSections = _sections.map((s) => s.copyWith()).toList();
+    _editingSections = _sections.map((s) => s).toList();
     notifyListeners();
   }
 
@@ -88,7 +94,7 @@ class HomeViewModel extends ChangeNotifier {
 
   void discardEditing() {
     _editing = false;
-    _editingSections = _sections.map((s) => s.copyWith()).toList();
+    _editingSections = _sections.map((s) => s).toList();
     notifyListeners();
   }
 
@@ -117,17 +123,17 @@ class HomeViewModel extends ChangeNotifier {
       int index = _editingSections.indexWhere((s) => s.name == section.name);
       if (index != -1) {
         _editingSections[index] = section.copyWith(
-          items: [...section.items, HomeItem(image: imageUrl)],
+          items: [...section.items, HomeProduct(image: imageUrl)],
         );
         notifyListeners();
       }
     } catch (e) {
-      print("Erro ao adicionar imagem: $e");
+      debugPrint("Erro ao adicionar imagem: $e");
     }
   }
 
   /// 📌Remove um item da seção e do Firebase Storage, se necessário.
-  Future<void> removeItem(HomeModel section, HomeItem item) async {
+  Future<void> removeItem(HomeModel section, HomeProduct item) async {
     int index = _editingSections.indexWhere((s) => s.name == section.name);
     if (index != -1) {
       if (item.image is String) {
@@ -139,12 +145,12 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   /// 📌Atualiza um item dentro de uma seção.
-  void updateItem(HomeModel section, HomeItem updatedItem) {
+  void updateItem(HomeModel section, HomeProduct updatedItem) {
     int sectionIndex =
         _editingSections.indexWhere((s) => s.name == section.name);
 
     if (sectionIndex != -1) {
-      List<HomeItem> updatedItems =
+      List<HomeProduct> updatedItems =
           List.from(_editingSections[sectionIndex].items);
 
       int itemIndex =
@@ -157,5 +163,9 @@ class HomeViewModel extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  void updateUI() {
+    notifyListeners();
   }
 }

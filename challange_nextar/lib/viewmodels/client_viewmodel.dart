@@ -17,9 +17,9 @@ class ClientViewModel extends ChangeNotifier {
         name: faker.person.name(),
         email: faker.internet.email(),
         perfil: faker.image.loremPicsum(
-          width: 150, // Largura da imagem
-          height: 150, // Altura da imagem
-          seed: i.toString(), // Semente para gerar URLs únicas
+          width: 150,
+          height: 150,
+          seed: i.toString(),
         ),
       ));
     }

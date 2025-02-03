@@ -1,13 +1,13 @@
-import 'package:challange_nextar/components/app_bar_component.dart';
-import 'package:challange_nextar/components/botao_component.dart';
-import 'package:challange_nextar/components/form_field_component.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/botao_widget.dart';
+import 'package:challange_nextar/core/widgets/form_field_widget.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class MudarSenha extends StatelessWidget {
-  const MudarSenha({
+class ChangePasswordView extends StatelessWidget {
+  const ChangePasswordView({
     super.key,
   });
 
@@ -16,7 +16,7 @@ class MudarSenha extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: const AppBarComponent(
+        appBar: const AppBarWidget(
           isTitulo: "Privacidade",
         ),
         body: SafeArea(
@@ -32,7 +32,7 @@ class MudarSenha extends StatelessWidget {
                     AppImages.esqueciSenhaImagem,
                   ),
                 ),
-                const FormFieldComponent(
+                const FormFieldWidget(
                   padding: EdgeInsets.symmetric(horizontal: 18),
                   textInputAction: TextInputAction.next,
                   prefixIcon: Icon(
@@ -43,7 +43,7 @@ class MudarSenha extends StatelessWidget {
                   hintText: "",
                 ),
                 const SizedBox(height: 10),
-                const FormFieldComponent(
+                const FormFieldWidget(
                   padding: EdgeInsets.symmetric(horizontal: 18),
                   textInputAction: TextInputAction.next,
                   prefixIcon: Icon(
@@ -54,7 +54,7 @@ class MudarSenha extends StatelessWidget {
                   hintText: "",
                 ),
                 const SizedBox(height: 10),
-                const FormFieldComponent(
+                const FormFieldWidget(
                   padding: EdgeInsets.symmetric(horizontal: 18),
                   prefixIcon: Icon(
                     Icons.lock,
@@ -64,7 +64,7 @@ class MudarSenha extends StatelessWidget {
                   hintText: "",
                 ),
                 const SizedBox(height: 25),
-                botaoAlterarDados(context)
+                _buildButton(context)
               ],
             ),
           ),
@@ -73,7 +73,7 @@ class MudarSenha extends StatelessWidget {
     );
   }
 
-  Widget botaoAlterarDados(BuildContext context) {
+  Widget _buildButton(BuildContext context) {
     return DefaultButton(
       borderRadius: BorderRadius.circular(10),
       nomeBotao: "Alterar senha",

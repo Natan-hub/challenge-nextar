@@ -1,10 +1,11 @@
-import 'package:challange_nextar/components/app_bar_component.dart';
-import 'package:challange_nextar/components/botao_component.dart';
-import 'package:challange_nextar/components/form_field_component.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
-import 'package:challange_nextar/utils/styles.dart';
-import 'package:challange_nextar/validators/validacoes_mixin.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/botao_widget.dart';
+import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/form_field_widget.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
+import 'package:challange_nextar/utils/validators/validacoes_mixin.dart';
 import 'package:challange_nextar/viewmodels/forgot_password_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -20,6 +21,35 @@ class ForgotPasswordView extends StatefulWidget {
 class ForgotPasswordStateView extends State<ForgotPasswordView>
     with ValidacoesMixin {
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final viewModel = context.watch<ForgotPasswordViewModel>();
+
+    if (viewModel.successMessage != null) {
+      Future.microtask(() {
+        FlushBarWidget.mostrar(
+          context,
+          viewModel.successMessage!,
+          Icons.check_circle_rounded,
+          AppColors.verdePadrao,
+        );
+        Navigator.pop(context);
+      });
+    }
+
+    if (viewModel.errorMessage != null) {
+      Future.microtask(() {
+        FlushBarWidget.mostrar(
+          context,
+          viewModel.errorMessage!,
+          Icons.error_outline,
+          Colors.red,
+        );
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModelForgotPaswword = context.watch<ForgotPasswordViewModel>();
 
@@ -28,7 +58,7 @@ class ForgotPasswordStateView extends State<ForgotPasswordView>
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         extendBodyBehindAppBar: true,
-        appBar: const AppBarComponent(
+        appBar: const AppBarWidget(
           isTitulo: 'Recuperar senha',
           isVoltar: true,
         ),
@@ -79,11 +109,11 @@ class ForgotPasswordStateView extends State<ForgotPasswordView>
   }
 
   Widget _buildEmailField(ForgotPasswordViewModel viewModelForgotPaswword) {
-    return FormFieldComponent(
+    return FormFieldWidget(
       padding: const EdgeInsets.symmetric(horizontal: 0),
       keyboardType: TextInputType.emailAddress,
       onFieldSubmitted: (value) =>
-          viewModelForgotPaswword.sendResetPasswordEmail(context),
+          viewModelForgotPaswword.sendResetPasswordEmail(),
       prefixIcon: const Icon(
         Icons.email,
         color: AppColors.primary,
@@ -109,7 +139,7 @@ class ForgotPasswordStateView extends State<ForgotPasswordView>
       onPressed: viewModelForgotPaswword.isLoading
           ? null
           : () {
-              viewModelForgotPaswword.sendResetPasswordEmail(context);
+              viewModelForgotPaswword.sendResetPasswordEmail();
             },
     );
   }

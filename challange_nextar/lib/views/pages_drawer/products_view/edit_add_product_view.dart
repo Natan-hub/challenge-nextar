@@ -1,440 +1,256 @@
 import 'dart:io';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:challange_nextar/components/app_bar_component.dart';
-import 'package:challange_nextar/components/form_field_component.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/botao_widget.dart';
+import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/form_field_widget.dart';
 import 'package:challange_nextar/models/product_model.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/validators/validacoes_mixin.dart';
+import 'package:challange_nextar/utils/validators/validacoes_mixin.dart';
+import 'package:challange_nextar/viewmodels/edit_add_product_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 
-class EditProductView extends StatefulWidget {
+class EditProductView extends StatelessWidget with ValidacoesMixin {
   final ProductModel? product;
 
-  const EditProductView({
-    super.key,
-    this.product,
-  });
-
-  @override
-  State<EditProductView> createState() => _EditProductViewState();
-}
-
-class _EditProductViewState extends State<EditProductView>
-    with ValidacoesMixin {
-  int _currentIndex = 0;
-
-  final ImagePicker picker = ImagePicker();
-
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  late ProductModel product;
-  bool isEditing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    isEditing = widget.product != null;
-    product = widget.product?.copyWith() ??
-        ProductModel(
-          id: const Uuid().v4(),
-          name: '',
-          description: '',
-          price: '',
-          stock: 0,
-          images: [],
-        );
-  }
-
-  Future<void> _saveProduct() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      await context.read<ProductViewModel>().saveProduct(product, isEditing);
-      Navigator.pop(context);
-    }
-  }
-
-  Future<void> _deleteProduct() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      await context.read<ProductViewModel>().deleteProduct(product);
-      Navigator.pop(context);
-    }
-  }
-
-  void onImageSelected(File file) {
-    setState(() {
-      product.localImages.add(file); // Agora as imagens locais são separadas
-    });
-    Navigator.of(context).pop();
-  }
+  const EditProductView({super.key, this.product});
 
   @override
   Widget build(BuildContext context) {
-    final isSaving = context.watch<ProductViewModel>().isSaving;
+    final productViewModel =
+        Provider.of<ProductViewModel>(context, listen: false);
 
-    final List<dynamic> allImages = [...product.images, ...product.localImages];
+    return ChangeNotifierProvider(
+      create: (_) => EditAddProductViewModel(productViewModel, product),
+      child: Consumer<EditAddProductViewModel>(
+        builder: (context, viewModel, child) {
+          final allImages = [
+            ...viewModel.product.images,
+            ...viewModel.product.localImages
+          ];
 
-    return Scaffold(
-      appBar: AppBarComponent(
-        isTitulo: isEditing ? 'Editando Produto' : 'Novo Produto',
-        isVoltar: true,
-        actions: [
-          isEditing
-              ? IconButton(
-                  onPressed: isSaving ? null : _deleteProduct,
-                  icon: const Icon(
-                    Icons.delete_rounded,
-                    color: Colors.black,
-                  ))
-              : const SizedBox()
-        ],
-      ),
-      body: Form(
-        key: formKey,
-        child: ListView(
-          children: [
-            FormField<List<dynamic>>(
-              initialValue: product.images,
-              validator: (images) => isNotEmptyImage(allImages, context),
-              builder: (state) {
-                // void onImageSelected(File file) {
-                //   state.value?.add(file);
-                //   state.didChange(state.value);
-                //   Navigator.of(context).pop();
-                // }
+          return Scaffold(
+            appBar: _buildAppBar(context, viewModel),
+            body: Form(
+              key: viewModel.formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _buildImageCarousel(viewModel, allImages, context),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    label: "Nome",
+                    initialValue: viewModel.product.name,
+                    onSaved: (text) => viewModel.product.name = text!,
+                    validator: (text) => combine([
+                      () => isNotEmpty(text, context),
+                      () => hasSixCharsTitleProduct(text, context),
+                    ]),
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    label: "Preço",
+                    initialValue: viewModel.product.price,
+                    keyboardType: TextInputType.number,
+                    onSaved: (text) => viewModel.product.price = text!,
+                    validator: (text) => combine([
+                      () => isNotEmpty(text, context),
+                      () => isNotZero(text, context),
+                    ]),
+                  ),
+                  const SizedBox(height: 15),
+                  _buildBiggerTextForm(context),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    label: "Estoque",
+                    initialValue: viewModel.product.stock.toString(),
+                    keyboardType: TextInputType.number,
+                    onSaved: (text) =>
+                        viewModel.product.stock = int.parse(text!),
+                    validator: (text) => combine([
+                      () => isNotEmpty(text, context),
+                    ]),
+                  ),
+                  const SizedBox(height: 20),
+                  DefaultButton(
+                    borderRadius: BorderRadius.circular(10),
+                    cor: AppColors.corBotao,
+                    padding: const EdgeInsets.fromLTRB(115, 20, 115, 20),
+                    nomeBotao: 'Salvar',
+                    onPressed: viewModel.isSaving
+                        ? null
+                        : () async {
+                            bool success = await viewModel.saveProduct();
+                            if (success) {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
 
-                return Column(
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: CarouselSlider.builder(
-                        itemCount: allImages.length +
-                            1, // Considera imagens locais e URLs
-                        itemBuilder: (context, index, realIndex) {
-                          if (index >= allImages.length) {
-                            // Se o index for maior que o número de imagens, exibe o botão de adicionar foto
-                            return Material(
-                              child: IconButton(
-                                icon: const Icon(Icons.add_a_photo),
-                                color: Theme.of(context).primaryColor,
-                                iconSize: 50,
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    builder: (_) => imageSourceSheet(
-                                      context,
-                                      onImageSelected,
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          }
-
-                          // Agora garantimos que o índice está dentro dos limites
-                          final image = allImages[index];
-
-                          return Stack(
-                            children: <Widget>[
-                              if (image is String)
-                                Image.network(
-                                  image,
-                                  fit: BoxFit.cover,
-                                )
-                              else if (image is File)
-                                Image.file(
-                                  image,
-                                  fit: BoxFit.cover,
-                                ),
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: IconButton(
-                                  icon: const Icon(Icons.delete_rounded),
-                                  color: AppColors.vermelhoPadrao,
-                                  onPressed: () {
-                                    setState(() {
-                                      if (image is String) {
-                                        product.images.remove(
-                                            image); // Remove URL do Firebase
-                                      } else {
-                                        product.localImages.remove(
-                                            image); // Remove arquivo local
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                        options: CarouselOptions(
-                          height: 250, // Altura do carrossel
-                          enableInfiniteScroll: false,
-                          enlargeCenterPage: true,
-                          autoPlay: false,
-                          viewportFraction: 0.9,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
+                              FlushBarWidget.mostrar(
+                                context,
+                                'Produto salvo com sucesso!',
+                                Icons.check_circle_rounded,
+                                AppColors.verdePadrao,
+                              );
+                            }
                           },
-                        ),
-                      ),
-                    ),
-                    // Indicador de posição do carrossel
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        (state.value?.length ?? 0) +
-                            1, // Inclui o indicador do botão
-                        (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          height: 8,
-                          width: _currentIndex == index ? 16 : 8,
-                          decoration: BoxDecoration(
-                            color: _currentIndex == index
-                                ? Colors.teal
-                                : Colors.grey.shade400,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 16),
-
-                            // Nome do produto
-                            FormFieldComponent(
-                              labelText: "Editando titulo",
-                              initialValue: product.name,
-                              hintText: "Nome do seu produto",
-                              onSaved: (text) => product.name = text!,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              validator: (text) => combine([
-                                () => isNotEmpty(text, context),
-                                () => hasSixCharsTitleProduct(text, context),
-                              ]),
-                            ),
-                            const SizedBox(height: 8),
-
-                            // Informações rápidas
-                            Text(
-                              'A partir de',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 13,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-
-                            FormFieldComponent(
-                              labelText: "Editando preço",
-                              initialValue: product.price,
-                              hintText: "Preço do seu produto",
-                              onSaved: (text) => product.price = text!,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                decimal: true,
-                              ),
-                              validator: (text) => combine([
-                                () => isNotEmpty(text, context),
-                                () => isNotZero(text, context),
-                              ]),
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            const SizedBox(height: 10),
-
-                            const Padding(
-                              padding: EdgeInsets.only(top: 16, bottom: 8),
-                              child: Text(
-                                'Descrição',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                            campoAreaDeTexto(context),
-                            const SizedBox(height: 8),
-
-                            const SizedBox(height: 4),
-
-                            FormFieldComponent(
-                              labelText: "Editando estoque",
-                              initialValue: product.stock.toString(),
-                              hintText: "Quantidade do seu produto",
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                decimal: true,
-                              ),
-                              onSaved: (text) =>
-                                  product.stock = int.parse(text!),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              validator: (text) => combine([
-                                () => isNotEmpty(text, context),
-                              ]),
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: isSaving ? null : _saveProduct,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.teal,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: isSaving
-                                    ? const CircularProgressIndicator()
-                                    : const Text("Salvar Produto"),
-                              ),
-                            ),
-                          ],
-                        )),
-
-                    if (state.hasError)
-                      Container(
-                        margin: const EdgeInsets.only(top: 16, left: 16),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          state.errorText ?? "",
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 12,
-                          ),
-                        ),
-                      )
-                  ],
-                );
-              },
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  imageSourceSheet(BuildContext context, Function(File) onImageSelected) {
-    return BottomSheet(
-      onClosing: () {},
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          TextButton(
-            onPressed: () async {
-              // Abre a câmera
-              final XFile? file =
-                  await picker.pickImage(source: ImageSource.camera);
-              if (file != null) {
-                editImage(File(file.path), onImageSelected, context);
+  Widget _buildImageCarousel(EditAddProductViewModel viewModel,
+      List<dynamic> allImages, BuildContext context) {
+    return Column(
+      children: [
+        AspectRatio(
+          aspectRatio: 1,
+          child: CarouselSlider.builder(
+            itemCount: allImages.length + 1,
+            itemBuilder: (context, index, _) {
+              if (index == allImages.length) {
+                return IconButton(
+                  icon: const Icon(Icons.add_a_photo, size: 50),
+                  onPressed: () => _showImagePicker(context, viewModel),
+                );
               }
+              final image = allImages[index];
+              return Stack(
+                children: [
+                  if (image is String)
+                    CachedNetworkImage(imageUrl: image, fit: BoxFit.cover)
+                  else if (image is File)
+                    Image.file(image, fit: BoxFit.cover),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => viewModel.removeImage(image),
+                    ),
+                  ),
+                ],
+              );
             },
-            child: const Text('Câmera'),
+            options: CarouselOptions(
+              height: 250,
+              enableInfiniteScroll: false,
+              onPageChanged: (index, _) => viewModel.updateCurrentIndex(index),
+            ),
           ),
-          TextButton(
-            onPressed: () async {
-              // Abre a galeria
-              final XFile? file =
-                  await picker.pickImage(source: ImageSource.gallery);
-              if (file != null) {
-                editImage(File(file.path), onImageSelected, context);
-              }
-            },
-            child: const Text('Galeria'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> editImage(
-    File file,
-    Function(File) onImageSelected,
-    BuildContext context,
-  ) async {
-    final CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: file.path,
-      aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: 'Editar Imagem',
-          toolbarColor: Theme.of(context).primaryColor,
-          toolbarWidgetColor: Colors.white,
-          lockAspectRatio: true,
         ),
       ],
     );
-
-    if (croppedFile != null) {
-      onImageSelected(File(croppedFile.path)); // Agora é um `File`
-    }
   }
 
-  Widget campoAreaDeTexto(
+  void _showImagePicker(
+      BuildContext context, EditAddProductViewModel viewModel) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton(
+              onPressed: () => viewModel.pickImage(ImageSource.camera),
+              child: const Text('Câmera')),
+          TextButton(
+              onPressed: () => viewModel.pickImage(ImageSource.gallery),
+              child: const Text('Galeria')),
+        ],
+      ),
+    );
+  }
+
+  AppBarWidget _buildAppBar(
+      BuildContext context, EditAddProductViewModel viewModel) {
+    return AppBarWidget(
+      isTitulo: viewModel.isEditing ? 'Editando Produto' : 'Novo Produto',
+      isVoltar: true,
+      actions: viewModel.isEditing
+          ? [
+              IconButton(
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.black,
+                  ),
+                  onPressed: () async {
+                    bool success = await viewModel.deleteProduct();
+                    if (success) {
+                      Navigator.pop(context);
+                      FlushBarWidget.mostrar(
+                        context,
+                        'Produto excluído com sucesso!',
+                        Icons.delete,
+                        AppColors.vermelhoPadrao,
+                      );
+                    }
+                  })
+            ]
+          : null,
+    );
+  }
+
+  Widget _buildBiggerTextForm(
     BuildContext context,
   ) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
-      child: TextFormField(
-        validator: (val) => combine([
-          () => isNotEmpty(val, context),
-        ]),
-        onSaved: (text) => product.description = text!,
-        initialValue: product.description,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        maxLength: 5000,
-        maxLines: 10,
-        cursorColor: AppColors.primary,
-        decoration: InputDecoration(
-          alignLabelWithHint: true,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-          fillColor: Colors.white,
-          filled: true,
-          labelText: "Descrição do seu produto",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-          contentPadding: const EdgeInsets.fromLTRB(15, 25, 15, 0),
+    return TextFormField(
+      validator: (val) => combine([
+        () => isNotEmpty(val, context),
+      ]),
+      onSaved: (text) => product?.description = text!,
+      initialValue: product?.description,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      maxLength: 5000,
+      maxLines: 10,
+      cursorColor: AppColors.primary,
+      decoration: InputDecoration(
+        labelText: "Descrição do seu produto",
+        alignLabelWithHint: true,
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.vermelhoPadrao),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.vermelhoPadrao),
+        ),
+        labelStyle: textFieldsLettersTextStyle(Colors.black),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.grey.shade400),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.grey.shade400),
         ),
       ),
     );
   }
+}
+
+Widget _buildTextField(
+    {required String label,
+    String? initialValue,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    required Function(String?) onSaved}) {
+  return FormFieldWidget(
+    labelText: label,
+    initialValue: initialValue,
+    keyboardType: keyboardType,
+    onSaved: onSaved,
+    hintText: '',
+    padding: EdgeInsets.zero,
+    validator: validator,
+  );
 }

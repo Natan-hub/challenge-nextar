@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 
-class HomeItem {
-  final dynamic image; 
-  String? product;
+class HomeProduct {
+  final dynamic image;
+  final String? product;
 
-  HomeItem({
+  HomeProduct({
     required this.image,
     this.product,
   });
 
-  factory HomeItem.fromMap(Map<String, dynamic> data) {
-    return HomeItem(
+  factory HomeProduct.fromMap(Map<String, dynamic> data) {
+    return HomeProduct(
       image: data['image'] ?? '',
       product: data['product'],
     );
@@ -24,10 +24,10 @@ class HomeItem {
     };
   }
 
-  HomeItem copyWith({dynamic image, String? product}) {
-    return HomeItem(
+  HomeProduct copyWith({dynamic image, String? product}) {
+    return HomeProduct(
       image: image ?? this.image,
-      product: product, 
+      product: product,
     );
   }
 }
@@ -35,9 +35,9 @@ class HomeItem {
 class HomeModel extends ChangeNotifier {
   String? id;
   String name;
-  final String type;
-  List<HomeItem> items;
-  int pos;
+  String type;
+  final List<HomeProduct> items;
+  final int pos;
   String? _error;
 
   HomeModel({
@@ -55,7 +55,7 @@ class HomeModel extends ChangeNotifier {
       name: data['name'],
       type: data['type'] ?? 'List',
       items: (data['items'] as List<dynamic>? ?? [])
-          .map((item) => HomeItem.fromMap(item as Map<String, dynamic>))
+          .map((item) => HomeProduct.fromMap(item as Map<String, dynamic>))
           .toList(),
       pos: data['pos'] ?? 0,
     );
@@ -71,7 +71,7 @@ class HomeModel extends ChangeNotifier {
   }
 
   HomeModel copyWith(
-      {String? name, String? type, List<HomeItem>? items, int? pos}) {
+      {String? name, String? type, List<HomeProduct>? items, int? pos}) {
     return HomeModel(
       id: id,
       name: name ?? this.name,
@@ -81,12 +81,12 @@ class HomeModel extends ChangeNotifier {
     );
   }
 
-  void addItem(HomeItem item) {
+  void addItem(HomeProduct item) {
     items.add(item);
     notifyListeners();
   }
 
-  void removeItem(HomeItem item) {
+  void removeItem(HomeProduct item) {
     items.remove(item);
     notifyListeners();
   }

@@ -1,27 +1,31 @@
-import 'package:challange_nextar/components/app_bar_component.dart';
-import 'package:challange_nextar/components/botao_component.dart';
-import 'package:challange_nextar/components/form_field_component.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/botao_widget.dart';
+import 'package:challange_nextar/core/widgets/form_field_widget.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
+import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
-class MudarEmail extends StatefulWidget {
-  const MudarEmail({
+class ChangeEmailView extends StatefulWidget {
+  const ChangeEmailView({
     super.key,
   });
 
   @override
-  State<MudarEmail> createState() => _MudarEmailState();
+  State<ChangeEmailView> createState() => _ChangeEmailViewState();
 }
 
-class _MudarEmailState extends State<MudarEmail> {
+class _ChangeEmailViewState extends State<ChangeEmailView> {
   @override
   Widget build(BuildContext context) {
+    final loginViewModel = context.watch<LoginViewModel>();
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: const AppBarComponent(isTitulo: "Alterar email"),
+        appBar: const AppBarWidget(isTitulo: "Alterar email"),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(vertical: 20),
@@ -35,20 +39,21 @@ class _MudarEmailState extends State<MudarEmail> {
                     AppImages.changeEmail,
                   ),
                 ),
-                const FormFieldComponent(
+                FormFieldWidget(
                   maxLength: 250,
-                  padding: EdgeInsets.symmetric(horizontal: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icon(
+                  prefixIcon: const Icon(
                     Icons.email,
                     color: AppColors.primary,
                   ),
                   labelText: "Email",
                   hintText: "Ex: nome@gmail.com ",
+                  initialValue: loginViewModel.dataUser!.email,
                 ),
                 const SizedBox(height: 25),
-                botaoAlterarDados(context)
+                _buildButton(context)
               ],
             ),
           ),
@@ -57,7 +62,7 @@ class _MudarEmailState extends State<MudarEmail> {
     );
   }
 
-  Widget botaoAlterarDados(BuildContext context) {
+  Widget _buildButton(BuildContext context) {
     return DefaultButton(
       borderRadius: BorderRadius.circular(10),
       nomeBotao: "Alterar email",

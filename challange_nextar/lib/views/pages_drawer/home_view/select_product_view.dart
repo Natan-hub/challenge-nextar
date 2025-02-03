@@ -1,5 +1,8 @@
-import 'package:challange_nextar/components/app_bar_component.dart';
-import 'package:challange_nextar/utils/styles.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +13,7 @@ class SelecetedProductView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppBarComponent(
+      appBar: const AppBarWidget(
         isTitulo: 'Vincular Produto',
         isVoltar: true,
       ),
@@ -22,11 +25,22 @@ class SelecetedProductView extends StatelessWidget {
             itemBuilder: (_, index) {
               final product = productManager.products[index];
               return ListTile(
-                leading: Image.network(product.images.first),
+                leading: CachedNetworkImage(
+                  imageUrl: product.images.first,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      CircularProgressIndicator(
+                    value: downloadProgress.progress,
+                    color: AppColors.primary,
+                  ),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.error,
+                    color: AppColors.vermelhoPadrao,
+                  ),
+                ),
                 title: Text(
                   product.name,
                   style: normalTextStyleDefault(
-                   Colors.black,
+                    Colors.black,
                   ),
                 ),
                 subtitle: Text(
@@ -37,6 +51,12 @@ class SelecetedProductView extends StatelessWidget {
                 ),
                 onTap: () {
                   Navigator.of(context).pop(product);
+                  FlushBarWidget.mostrar(
+                    context,
+                    'Produto vinculado',
+                    Icons.check_circle_rounded,
+                    AppColors.verdePadrao,
+                  );
                 },
               );
             },

@@ -1,9 +1,6 @@
-import 'package:challange_nextar/components/flush_bar_component.dart';
 import 'package:challange_nextar/models/login_model.dart';
 import 'package:challange_nextar/models/user_model.dart';
-import 'package:challange_nextar/routes/pages.dart';
 import 'package:challange_nextar/services/login_service.dart';
-import 'package:challange_nextar/utils/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -40,21 +37,19 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   // Lógica de validação e login
-  Future<void> login(BuildContext context) async {
-    if (isLoading) return;
+  Future<String?> login() async {
+    if (isLoading) return null;
 
     isLoading = true;
     notifyListeners();
 
     try {
       if (loginKey.currentState!.validate()) {
-        // Criando um objeto UserModel para validação
         final user = LoginModel(
           email: usernameController.text.trim(),
           password: passwordController.text,
         );
 
-        // Realiza login com o AuthService
         final loggedUser = await _loginService.signIn(
           user.email,
           user.password,
@@ -63,45 +58,26 @@ class LoginViewModel extends ChangeNotifier {
         if (loggedUser != null) {
           currentUser = loggedUser;
           dataUser = _loginService.dataUser;
-
-          Navigator.pushReplacementNamed(
-            context,
-            Routes.hiddenDrawer,
-          );
-
-          FlushBarComponent.mostrar(
-            context,
-            'Acesso realizado com sucesso',
-            Icons.check_circle_rounded,
-            AppColors.verdePadrao,
-          );
-
-          notifyListeners(); // Notifica sobre o login bem-sucedido
+          notifyListeners();
+          return 'Acesso realizado com sucesso';
         }
       }
     } catch (e) {
       String errorMessage = e.toString();
-      String mensagem;
 
       if (errorMessage.contains(
           'The password is invalid or the user does not have a password')) {
-        mensagem = 'Email ou senha inválidos.';
+        return 'Email ou senha inválidos.';
       } else if (errorMessage.contains('There is no user record')) {
-        mensagem = 'Esse email não possui uma conta';
+        return 'Esse email não possui uma conta';
       } else {
-        mensagem = 'Erro desconhecido: $errorMessage';
+        return 'Erro desconhecido: $errorMessage';
       }
-
-      FlushBarComponent.mostrar(
-        context,
-        mensagem,
-        Icons.warning_amber,
-        AppColors.vermelhoPadrao,
-      );
     } finally {
       isLoading = false;
       notifyListeners();
     }
+    return null;
   }
 
   // Faz logout do usuário

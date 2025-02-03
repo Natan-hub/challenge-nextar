@@ -1,7 +1,7 @@
 class ClientModel {
-  String name;
-  String email;
-  String perfil;
+  final String name;
+  final String email;
+  final String perfil;
 
   ClientModel({
     required this.name,

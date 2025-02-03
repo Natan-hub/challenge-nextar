@@ -1,8 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:challange_nextar/components/app_bar_component.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/botao_widget.dart';
 import 'package:challange_nextar/models/product_model.dart';
-import 'package:challange_nextar/routes/pages.dart';
-import 'package:challange_nextar/utils/colors.dart';
+import 'package:challange_nextar/routes/routes.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:flutter/material.dart';
 
 class DetailsProduct extends StatefulWidget {
@@ -19,245 +22,230 @@ class DetailsProduct extends StatefulWidget {
 
 class _DetailsProductState extends State<DetailsProduct> {
   int _currentIndex = 0;
-
   @override
   Widget build(BuildContext context) {
-    int stock = widget.product.stock;
-
     return Scaffold(
-      
-      appBar: AppBarComponent(
+      appBar: AppBarWidget(
         isTitulo: widget.product.name,
         isVoltar: true,
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.edit_rounded,
-              color: Colors.black,
-            ),
+            icon: const Icon(Icons.edit_rounded, color: Colors.black),
             onPressed: () {
-              Navigator.pushReplacementNamed(
+              Navigator.pushNamed(
                 context,
                 Routes.editAddProduct,
-                arguments: {
-                  'product': widget.product,
-                },
+                arguments: {'product': widget.product},
               );
             },
           ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding:
-              EdgeInsets.only(top: MediaQuery.of(context).padding.top - 10),
-          child: Column( 
-            children: [
-              AspectRatio(
-                aspectRatio: 1,
-                child: CarouselSlider.builder(
-                  itemCount: widget.product.images.length,
-                  itemBuilder: (context, index, realIndex) {
-                    final imageUrl = widget.product.images[index];
-                    return ClipRRect( 
-                      borderRadius: BorderRadius.circular(8),
-                      child: SizedBox( 
-                        width: MediaQuery.of(context)
-                            .size
-                            .width, // Ocupa toda a largura disponível
-                        child: Image.network( 
-                          imageUrl,
-                          fit: BoxFit.contain, // Garante que a imagem preencha todo o card
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Center(
-                              child: Icon(
-                                Icons.image_not_supported,
-                                size: 50,
-                                color: Colors.grey,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                  options: CarouselOptions(
-                    height: 250, // Altura do carrossel
-                
-                    enableInfiniteScroll: true,
-                    viewportFraction: 0.9,
-                    enlargeCenterPage: true,
-                    autoPlay: false,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                    },
-                  ),
-                ),
-              ),
+        child: Column(
+          children: [
+            _buildImageCarousel(),
+            const SizedBox(height: 8),
+            _buildCarouselIndicators(),
+            const SizedBox(height: 8),
+            _buildProductDetails(),
+          ],
+        ),
+      ),
+    );
+  }
 
-              // Indicadores do carrossel
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  widget.product.images.length,
-                  (index) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    height: 8,
-                    width: _currentIndex == index ? 16 : 8,
-                    decoration: BoxDecoration(
-                      color: _currentIndex == index
-                          ? Colors.teal
-                          : Colors.grey.shade400,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-              ),
+  /// 🔹 Constrói o carrossel de imagens do produto.
+  Widget _buildImageCarousel() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.5,
+      width: double.infinity,
+      child: CarouselSlider.builder(
+        itemCount: widget.product.images.length,
+        itemBuilder: (context, index, realIndex) {
+          final imageUrl = widget.product.images[index];
+          return CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+            errorWidget: (context, url, error) => const Icon(
+              Icons.error,
+              color: AppColors.vermelhoPadrao,
+            ),
+          );
+        },
+        options: CarouselOptions(
+          height: MediaQuery.of(context).size.height * 0.5,
+          viewportFraction: 1.0,
+          enableInfiniteScroll: true,
+          autoPlay: false,
+          enlargeCenterPage: false,
+          onPageChanged: (index, reason) {
+            setState(() => _currentIndex = index);
+          },
+        ),
+      ),
+    );
+  }
 
-              const SizedBox(height: 8),
-
-              // Informações detalhadas
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration:   BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-
-                    // Nome do produto
-                    Text(
-                      widget.product.name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Informações rápidas
-                    Text(
-                      'A partir de',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      widget.product.price,
-                      style: const TextStyle(
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Avaliações
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        const Text(
-                          "5.0/5",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "(23 Reviews)",
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16, bottom: 8),
-                      child: Text(
-                        'Descrição',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    Text(
-                      widget.product.description,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 8),
-
-                    Text(
-                      stock > 0 ? 'Estoque disponível' : 'Estoque indisponível',
-                      style: TextStyle(
-                        color: stock > 0
-                            ? AppColors.verdePadrao
-                            : AppColors.vermelhoPadrao,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          'Quantidade: ',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          widget.product.stock.toString(),
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Botão de ação
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Função de iniciar receita
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          "Start Cooking",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+  /// 🔹 Constrói os indicadores do carrossel.
+  Widget _buildCarouselIndicators() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        widget.product.images.length,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          height: 8,
+          width: _currentIndex == index ? 16 : 8,
+          decoration: BoxDecoration(
+            color: _currentIndex == index ? Colors.teal : Colors.grey.shade400,
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
+      ),
+    );
+  }
+
+  /// 🔹 Constrói os detalhes do produto, incluindo nome, preço, avaliações e descrição.
+  Widget _buildProductDetails() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            spreadRadius: 5,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 15),
+          _buildProductName(),
+          const SizedBox(height: 8),
+          _buildPriceSection(),
+          const SizedBox(height: 8),
+          _buildReviewSection(),
+          const SizedBox(height: 10),
+          _buildDescription(),
+          const SizedBox(height: 8),
+          _buildStockInfo(),
+          const SizedBox(height: 16),
+          _buildPurchaseButton(),
+        ],
+      ),
+    );
+  }
+
+  /// 🔹 Exibe o nome do produto.
+  Widget _buildProductName() {
+    return Text(
+      widget.product.name,
+      style: highlightedText(Colors.black),
+    );
+  }
+
+  /// 🔹 Exibe a seção de preço.
+  Widget _buildPriceSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('A partir de', style: subTextStyle()),
+        const SizedBox(height: 5),
+        Text(widget.product.price, style: priceDetaildProductTextStyle()),
+      ],
+    );
+  }
+
+  /// 🔹 Exibe a seção de avaliações do produto.
+  Widget _buildReviewSection() {
+    return Row(
+      children: [
+        const Icon(Icons.star_rounded, color: Colors.amber),
+        const SizedBox(width: 5),
+        Text("5.0/5", style: normalTextStyleBold(Colors.black)),
+        const SizedBox(width: 5),
+        Text("(23 Reviews)", style: normalTextStyleBold(Colors.grey.shade600)),
+      ],
+    );
+  }
+
+  /// 🔹 Exibe a descrição do produto dentro de um card elevado.
+  Widget _buildDescription() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 15, bottom: 10),
+          child: Text('Descrição', style: normalTextStyle(Colors.black)),
+        ),
+        Material(
+          elevation: 3,
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              widget.product.description,
+              style: normalTextStyleDefault(Colors.black),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 🔹 Exibe informações sobre o estoque do produto.
+  Widget _buildStockInfo() {
+    int stock = widget.product.stock;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          stock > 0 ? 'Estoque disponível' : 'Estoque indisponível',
+          style: normalTextStyleDefault(
+            stock > 0 ? AppColors.verdePadrao : AppColors.vermelhoPadrao,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Row(
+          children: [
+            Text('Quantidade: ', style: normalTextStyleDefault(Colors.black)),
+            Text(widget.product.stock.toString(),
+                style: normalTextStyleBold(AppColors.primary)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// 🔹 Constrói o botão de compra.
+  Widget _buildPurchaseButton() {
+    int stock = widget.product.stock;
+    return SizedBox(
+      width: double.infinity,
+      child: DefaultButton(
+        borderRadius: BorderRadius.circular(10),
+        nomeBotao: stock > 0 ? 'Comprar' : 'Estoque indisponível',
+        cor: AppColors.corBotao,
+        padding: const EdgeInsets.fromLTRB(115, 20, 115, 20),
+        onPressed: () {},
       ),
     );
   }

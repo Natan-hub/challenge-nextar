@@ -1,4 +1,4 @@
-import 'package:challange_nextar/utils/colors.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

@@ -1,4 +1,4 @@
-import 'package:challange_nextar/utils/colors.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -84,6 +84,14 @@ TextStyle textFieldsLettersTextStyle(Color color) {
 TextStyle biggerTextStyle() {
   return GoogleFonts.dmSans(
     fontSize: 30,
+    fontWeight: FontWeight.bold,
+    color: AppColors.primary,
+  );
+}
+
+TextStyle priceDetaildProductTextStyle() {
+  return GoogleFonts.dmSans(
+    fontSize: 22,
     fontWeight: FontWeight.bold,
     color: AppColors.primary,
   );

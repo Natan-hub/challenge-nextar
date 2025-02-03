@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "challange_nextar",
+            "cwd": "challange_nextar",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "challange_nextar (profile mode)",
+            "cwd": "challange_nextar",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "challange_nextar (release mode)",
+            "cwd": "challange_nextar",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

@@ -1,8 +1,9 @@
-import 'package:challange_nextar/helper/init_app_helper.dart';
-import 'package:challange_nextar/routes/routes.dart';
+import 'package:challange_nextar/helper/redirect_user_helper.dart';
+import 'package:challange_nextar/routes/pages.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
+import 'package:challange_nextar/viewmodels/edit_add_product_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/forgot_password_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/home_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
@@ -11,8 +12,8 @@ import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AppWidget extends StatelessWidget {
+  const AppWidget({super.key});
 
   // This widget is the root of your application.
   @override
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
           create: (_) => ProductViewModel(),
         ),
         ChangeNotifierProvider(
+          create: (_) => EditAddProductViewModel(),
+        ),
+        ChangeNotifierProvider(
           create: (_) => HomeViewModel(),
         ),
       ],
@@ -41,10 +45,10 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: Pages.generateRoute,
         home: AnimatedSplashScreen(
           splash: AppImages.splashGif,
-          nextScreen: const SplashHandler(),
-          splashIconSize: 1500,
+          nextScreen: const RedirectUserHelper(),
+          splashIconSize: 1000,
           centered: true,
-          duration: 2900,
+          duration: 3000,
         ),
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
@@ -59,4 +63,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

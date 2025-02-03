@@ -1,4 +1,4 @@
-import 'package:challange_nextar/app.dart';
+import 'package:challange_nextar/app_widget.dart';
 import 'package:challange_nextar/firebase_options.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -13,5 +13,5 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FlutterNativeSplash.remove();
-  runApp(const MyApp());
+  runApp(const AppWidget());
 }

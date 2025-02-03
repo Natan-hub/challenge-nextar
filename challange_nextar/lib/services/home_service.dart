@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/home_model.dart';
 
@@ -27,10 +28,8 @@ class HomeService {
 
     if (section.id == null) {
       final docRef = await collection.add(section.toMap());
-      section.id = docRef.id; 
-      await collection
-          .doc(section.id)
-          .update({'id': section.id}); 
+      section.id = docRef.id;
+      await collection.doc(section.id).update({'id': section.id});
     } else {
       await collection
           .doc(section.id)
@@ -72,7 +71,7 @@ class HomeService {
       Reference ref = _storage.refFromURL(imageUrl);
       await ref.delete();
     } catch (e) {
-      print("Erro ao excluir imagem do Firebase Storage: $e");
+      debugPrint("Erro ao excluir imagem do Firebase Storage: $e");
     }
   }
 }

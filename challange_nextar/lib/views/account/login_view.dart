@@ -1,10 +1,12 @@
-import 'package:challange_nextar/components/app_bar_component.dart';
-import 'package:challange_nextar/components/botao_component.dart';
-import 'package:challange_nextar/components/form_field_component.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
-import 'package:challange_nextar/utils/styles.dart';
-import 'package:challange_nextar/validators/validacoes_mixin.dart';
+import 'package:challange_nextar/core/widgets/app_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/botao_widget.dart';
+import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/form_field_widget.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
+import 'package:challange_nextar/routes/routes.dart';
+import 'package:challange_nextar/utils/validators/validacoes_mixin.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:challange_nextar/views/account/forgot_password_view.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -37,7 +39,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
           child: Scaffold(
             resizeToAvoidBottomInset: true,
             extendBodyBehindAppBar: true,
-            appBar: const AppBarComponent(
+            appBar: const AppBarWidget(
               isTitulo: 'Acessar sua conta',
             ),
             body: Form(
@@ -89,7 +91,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
   }
 
   Widget _buildEmailField(LoginViewModel viewModelLogin) {
-    return FormFieldComponent(
+    return FormFieldWidget(
       padding: EdgeInsets.zero,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
@@ -108,7 +110,7 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
   }
 
   Widget _buildPasswordField(LoginViewModel viewModelLogin) {
-    return FormFieldComponent(
+    return FormFieldWidget(
       padding: EdgeInsets.zero,
       textInputAction: TextInputAction.done,
       prefixIcon: const Icon(
@@ -180,8 +182,27 @@ class _LoginViewState extends State<LoginView> with ValidacoesMixin {
       cor: AppColors.corBotao,
       padding: const EdgeInsets.fromLTRB(115, 20, 115, 20),
       nomeBotao: 'Login',
-      onPressed:
-          viewModelLogin.isLoading ? null : () => viewModelLogin.login(context),
+      onPressed: viewModelLogin.isLoading
+          ? null
+          : () async {
+              final mensagem = await viewModelLogin.login();
+              if (mensagem != null) {
+                FlushBarWidget.mostrar(
+                  context,
+                  mensagem,
+                  mensagem == 'Acesso realizado com sucesso'
+                      ? Icons.check_circle_rounded
+                      : Icons.warning_amber,
+                  mensagem == 'Acesso realizado com sucesso'
+                      ? AppColors.verdePadrao
+                      : AppColors.vermelhoPadrao,
+                );
+
+                if (mensagem == 'Acesso realizado com sucesso') {
+                  Navigator.pushReplacementNamed(context, Routes.hiddenDrawer);
+                }
+              }
+            },
       child: viewModelLogin.isLoading
           ? const CircularProgressIndicator(color: Colors.white)
           : const Text('Login'),

@@ -1,5 +1,3 @@
-import 'package:challange_nextar/components/flush_bar_component.dart';
-import 'package:challange_nextar/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordViewModel extends ChangeNotifier {
@@ -7,31 +5,24 @@ class ForgotPasswordViewModel extends ChangeNotifier {
   final emailController = TextEditingController();
 
   bool isLoading = false;
+  String? successMessage;
+  String? errorMessage;
 
-  // Lógica para validar e enviar o email
-  Future<void> sendResetPasswordEmail(BuildContext context) async {
+  /// Envia o email de recuperação de senha
+  Future<void> sendResetPasswordEmail() async {
     if (isLoading || formKey.currentState?.validate() != true) return;
 
     isLoading = true;
+    successMessage = null;
+    errorMessage = null;
     notifyListeners();
 
     try {
       await Future.delayed(const Duration(seconds: 2));
       clearFields();
-      Navigator.pop(context);
-      FlushBarComponent.mostrar(
-        context,
-        'Email enviado',
-        Icons.check_circle_rounded,
-        AppColors.verdePadrao,
-      );
+      successMessage = 'Email enviado com sucesso';
     } catch (error) {
-      FlushBarComponent.mostrar(
-        context,
-        'Erro ao enviar o email. Tente novamente.',
-        Icons.check_circle_rounded,
-        AppColors.verdePadrao,
-      );
+      errorMessage = 'Erro ao enviar o email. Tente novamente.';
     } finally {
       isLoading = false;
       notifyListeners();

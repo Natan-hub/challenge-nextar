@@ -1,17 +1,17 @@
-import 'package:challange_nextar/routes/pages.dart';
-import 'package:challange_nextar/utils/colors.dart';
+import 'package:challange_nextar/core/widgets/shimmer_loading_widget.dart';
+import 'package:challange_nextar/routes/routes.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SplashHandler extends StatefulWidget {
-  const SplashHandler({super.key});
+class RedirectUserHelper extends StatefulWidget {
+  const RedirectUserHelper({super.key});
 
   @override
-  State<SplashHandler> createState() => _SplashHandlerState();
+  State<RedirectUserHelper> createState() => _RedirectUserHelperState();
 }
 
-class _SplashHandlerState extends State<SplashHandler> {
+class _RedirectUserHelperState extends State<RedirectUserHelper> {
   bool _initialized = false;
 
   @override
@@ -39,9 +39,9 @@ class _SplashHandlerState extends State<SplashHandler> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
+        child: shimerColor(context),
       ),
     );
   }

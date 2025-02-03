@@ -1,7 +1,7 @@
 class UserModel {
-  String email;
-  String name;
-  int id;
+  final String email;
+  final String name;
+  final int id;
 
   UserModel({
     required this.email,

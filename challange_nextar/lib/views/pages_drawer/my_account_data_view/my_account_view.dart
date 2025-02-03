@@ -1,15 +1,15 @@
-import 'package:challange_nextar/components/flush_bar_component.dart';
-import 'package:challange_nextar/components/native_dialog.dart';
-import 'package:challange_nextar/routes/pages.dart';
-import 'package:challange_nextar/utils/colors.dart';
-import 'package:challange_nextar/utils/images.dart';
+import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
+import 'package:challange_nextar/core/widgets/native_dialog_widget.dart';
+import 'package:challange_nextar/routes/routes.dart';
+import 'package:challange_nextar/core/theme/colors.dart';
+import 'package:challange_nextar/core/theme/images.dart';
+import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
 import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_data_view.dart';
 import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_email_view.dart';
 import 'package:challange_nextar/views/pages_drawer/my_account_data_view/my_password_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:babstrap_settings_screen/babstrap_settings_screen.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +50,6 @@ class _ConfigAccountState extends State<ConfigAccount> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Atualize a variável 'orientation' apenas aqui.
     orientation = MediaQuery.of(context).orientation;
   }
 
@@ -62,113 +61,9 @@ class _ConfigAccountState extends State<ConfigAccount> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (orientation == Orientation.portrait)
-          Card(
-            color: AppColors.corBotao,
-            // Define the shape of the card
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            // Define how the card's content should be clipped
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            // Define the child widget of the card
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: CircleAvatar(
-                    radius: 65,
-                    backgroundColor: Colors.white.withOpacity(.2),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: CircleAvatar(
-                    radius: 65,
-                    backgroundColor: Colors.white.withOpacity(.09),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: CircleAvatar(
-                    radius: 65,
-                    backgroundColor: Colors.white.withOpacity(.05),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    // Add padding around the row widget
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          // Add an image widget to display an image
-                          ClipOval(
-                            child: Image.asset(
-                              AppImages.logoEmpresa,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          // Add some spacing between the image and the text
-                          Container(width: 20),
-                          // Add an expanded widget to take up the remaining horizontal space
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                // Add some spacing between the top of the card and the title
-                                Container(height: 5),
-                                // Add a title widget
-
-                                Text(
-                                  maxLines: 2,
-                                  "Nextar",
-                                  style: GoogleFonts.dmSans(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white),
-                                ),
-
-                                // Add some spacing between the title and the subtitle
-                                Container(height: 5),
-                                // Add a subtitle widget
-                                Text(maxLines: 2, 'Super empresa'),
-                                // Add some spacing between the subtitle and the text
-                                Container(height: 10),
-                                // Add a text widget to display some text
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
+          _buildPrincipalCard()
         else
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            elevation: 5,
-            child: ListTile(
-              leading: Container(
-                  clipBehavior: Clip.hardEdge,
-                  width: 40,
-                  decoration: const BoxDecoration(shape: BoxShape.circle),
-                  child: Image.asset(
-                    AppImages.logoEmpresa,
-                  )),
-              title: Text(
-                "Nextar",
-              ),
-            ),
-          ),
+          _buildCardHorizontal(),
         SettingsGroup(
           items: [
             SettingsItem(
@@ -178,7 +73,7 @@ class _ConfigAccountState extends State<ConfigAccount> {
                   isDismissible: false,
                   context: context,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => const MeusDados(),
+                  builder: (context) => const MyDataView(),
                 );
               },
               icons: CupertinoIcons.pencil_outline,
@@ -199,7 +94,7 @@ class _ConfigAccountState extends State<ConfigAccount> {
                   isDismissible: false,
                   context: context,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => const MudarSenha(),
+                  builder: (context) => const ChangePasswordView(),
                 );
               },
               icons: Icons.password,
@@ -218,7 +113,7 @@ class _ConfigAccountState extends State<ConfigAccount> {
                   isDismissible: false,
                   context: context,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => const MudarEmail(),
+                  builder: (context) => const ChangeEmailView(),
                 );
               },
               icons: CupertinoIcons.repeat,
@@ -232,7 +127,6 @@ class _ConfigAccountState extends State<ConfigAccount> {
           ],
         ),
         SettingsGroup(
-          // +settingsGroupTitle: AppLocalizations.of(context).conta,
           items: [
             SettingsItem(
               onTap: () {
@@ -243,7 +137,7 @@ class _ConfigAccountState extends State<ConfigAccount> {
                     confirmButtonText: "Sim",
                     cancelButtonText: "Cancelar",
                     onConfirm: () async {
-                      await logoffEmpresa(context, viewModelLogin);
+                      await logoff(context, viewModelLogin);
                     });
               },
               icons: Icons.exit_to_app_rounded,
@@ -255,12 +149,118 @@ class _ConfigAccountState extends State<ConfigAccount> {
     );
   }
 
-  Future<void> logoffEmpresa(
+  ///📌 Esse card foi construido acessando o código do package que estou usando o babstrap_settings_screen
+  ///e copiando ele, pois queria usufrir do design mas queria mudar o jeito que é utilizado a imagem de perfil
+  ///já que o padrão do package não consigo manipular ela muito bem, então essa foi a solução que encontrei
+
+  Widget _buildPrincipalCard() {
+    return Card(
+      color: AppColors.corBotao,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: CircleAvatar(
+              radius: 65,
+              backgroundColor: Colors.white.withOpacity(.2),
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: CircleAvatar(
+              radius: 65,
+              backgroundColor: Colors.white.withOpacity(.09),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: CircleAvatar(
+              radius: 65,
+              backgroundColor: Colors.white.withOpacity(.05),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    ClipOval(
+                      child: Image.asset(
+                        AppImages.logoEmpresa,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Container(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(height: 5),
+                          Text(
+                              maxLines: 2,
+                              "Nextar",
+                              style: highlightedText(Colors.white)),
+                          Container(height: 5),
+                          Text(
+                            maxLines: 2,
+                            'A empresa de maior refêrencia no Brasil',
+                            style: normalTextStyleDefault(
+                              Colors.white,
+                            ),
+                          ),
+                          Container(height: 10),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  ///📌 Quando colocamos a tela vertical de lado o card acaba ocupando um espaço maior que o necessário
+  ///pensando nisso adaptei a tela para mostrar um card mais simples com a tela horizontal onde o usuário consiga
+  ///ter visualização boa da tela e escolhi essa forma para demonstrar meu conhecimento de orientação
+  Widget _buildCardHorizontal() {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 5,
+      child: ListTile(
+        leading: Container(
+            clipBehavior: Clip.hardEdge,
+            width: 40,
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            child: Image.asset(
+              AppImages.logoEmpresa,
+            )),
+        title: Text(
+          "Nextar",
+          style: highlightedText(Colors.black),
+        ),
+      ),
+    );
+  }
+
+  Future<void> logoff(
       BuildContext context, LoginViewModel viewModelLogin) async {
-    // Exibe o diálogo de carregamento
     showDialog(
       context: context,
-      barrierDismissible: false, // Impede que o usuário feche o diálogo
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return const AlertDialog(
           title: Text("Desconectando..."),
@@ -275,16 +275,15 @@ class _ConfigAccountState extends State<ConfigAccount> {
     );
 
     try {
-      final resposta = await viewModelLogin.signOut();
+      final response = await viewModelLogin.signOut();
 
-      if (!context.mounted) return; // Evita exceção se o contexto for destruído
+      if (!context.mounted) return;
 
-      Navigator.pop(context); // Fecha o diálogo de carregamento
-
-      if (resposta != null) {
+      Navigator.pop(context);
+      if (response) {
         Navigator.pushReplacementNamed(context, Routes.login);
       } else {
-        FlushBarComponent.mostrar(
+        FlushBarWidget.mostrar(
           context,
           "Erro ao sair da conta",
           Icons.warning_amber,
@@ -293,9 +292,9 @@ class _ConfigAccountState extends State<ConfigAccount> {
       }
     } catch (exception) {
       if (context.mounted) {
-        Navigator.pop(context); // Fecha o diálogo de carregamento
+        Navigator.pop(context);
 
-        FlushBarComponent.mostrar(
+        FlushBarWidget.mostrar(
           context,
           "Erro ao desconectar. Tente novamente.",
           Icons.warning_amber,

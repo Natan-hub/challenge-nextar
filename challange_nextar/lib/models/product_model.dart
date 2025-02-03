@@ -8,10 +8,10 @@ class ProductModel {
   String description;
   String price;
   int stock;
-  List<String> images;
+  final List<String> images;
   List<File> localImages = []; // Armazena imagens locais temporariamente
-  bool deleted;
-  
+  final bool deleted;
+
   ProductModel({
     required this.id,
     required this.name,
