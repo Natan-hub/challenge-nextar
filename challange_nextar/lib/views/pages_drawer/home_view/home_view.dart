@@ -4,16 +4,36 @@ import 'package:challange_nextar/core/theme/styles.dart';
 import 'package:challange_nextar/core/widgets/flush_bar_widget.dart';
 import 'package:challange_nextar/viewmodels/home_viewmodel.dart';
 import 'package:challange_nextar/viewmodels/login_viewmodel.dart';
+import 'package:challange_nextar/viewmodels/products_viewmodel.dart';
 import 'package:challange_nextar/views/pages_drawer/home_view/section_view.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   HomeView({super.key});
 
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   final ImagePicker picker = ImagePicker();
+
+  @override
+void initState() {
+  super.initState();
+
+  // Garante que os produtos sejam carregados ao entrar na tela
+  Future.microtask(() {
+    final productViewModel = context.read<ProductViewModel>();
+    if (productViewModel.products.isEmpty) {
+      productViewModel.loadInitialProducts();
+    }
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {

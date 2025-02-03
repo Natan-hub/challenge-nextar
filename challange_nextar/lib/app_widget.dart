@@ -48,7 +48,7 @@ class AppWidget extends StatelessWidget {
           nextScreen: const RedirectUserHelper(),
           splashIconSize: 1000,
           centered: true,
-          duration: 3000,
+          duration: 1500,
         ),
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,

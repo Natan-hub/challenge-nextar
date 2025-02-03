@@ -36,6 +36,25 @@ class ProductService {
     }
   }
 
+  /// 📌 Retorna todos os produtos não deletados do Firestore
+  Future<List<ProductModel>> getProducts() async {
+    try {
+      final QuerySnapshot snapProducts = await _firestore
+          .collection('products')
+          .where('deleted', isEqualTo: false)
+          .get();
+
+      final products = snapProducts.docs
+          .map((doc) => ProductModel.fromFirestore(doc))
+          .toList();
+
+      _allProducts = products;
+      return products;
+    } catch (e) {
+      throw Exception('Erro ao carregar produtos: ${e.toString()}');
+    }
+  }
+
   /// 🔹 Faz upload das imagens locais e mantém as já existentes
   Future<List<String>> _processImages(ProductModel product) async {
     List<String> updatedImages = List.from(product.images);

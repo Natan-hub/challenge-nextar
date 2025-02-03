@@ -71,12 +71,22 @@ class ProductViewModel extends ChangeNotifier {
 
   ///📌 Carrega a lista inicial de produtos, resetando a paginação.
   Future<void> loadInitialProducts() async {
-    _productService.resetPagination();
-    _products.clear();
-    _hasMoreProducts = true;
-    _selectionMode = false;
-    _selectedProducts.clear();
-    await _loadNextBatch();
+    if (_products.isNotEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final loadedProducts = await _productService.getProducts();
+      _products = loadedProducts;
+      _hasMoreProducts = loadedProducts.length >= _productService.batchSize;
+    } catch (e) {
+      debugPrint("Erro ao carregar produtos: $e");
+      errorMessage = "Erro ao carregar produtos.";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> loadMoreProducts() async {
@@ -87,7 +97,13 @@ class ProductViewModel extends ChangeNotifier {
 
     try {
       final newProducts = await _productService.loadNextBatch();
-      _products.addAll(newProducts.where((p) => !p.deleted));
+
+      // 🔹 Evita duplicação
+      final uniqueProducts = newProducts.where(
+        (newP) => !_products.any((existingP) => existingP.id == newP.id),
+      );
+
+      _products.addAll(uniqueProducts);
 
       if (newProducts.length < _productService.batchSize) {
         _hasMoreProducts = false;
@@ -189,10 +205,10 @@ class ProductViewModel extends ChangeNotifier {
 
   /// 📌Busca um produto pelo ID.
   ProductModel? findProductById(String id) {
-    _products = _productService.allProducts;
     try {
       return _products.firstWhere((p) => p.id == id);
     } catch (e) {
+      debugPrint("Produto não encontrado: $e");
       return null;
     }
   }

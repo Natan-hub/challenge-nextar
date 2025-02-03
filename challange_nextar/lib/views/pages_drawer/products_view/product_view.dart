@@ -187,7 +187,7 @@ class _ProductViewState extends State<ProductView> {
           ),
           const SizedBox(height: 20),
           Text(
-            "Nenhum produto criado, clique no botão inferior direito e adicione.",
+            "Nenhum produto criado, \nclique no botão inferior direito e adicione.",
             style: principalTextStyle(),
           ),
           const SizedBox(height: 20),
