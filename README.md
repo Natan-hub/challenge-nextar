@@ -54,6 +54,72 @@ flutter run --release
 user@gmail.com
 123456
 ```
+### 📌 Curiosidades
+> Todas as cores do projeto foram retiradas do site e do instagram da Nextar;
+
+### 📌 Telas e funções
+
+![Captura de tela 2025-02-03 024156](https://github.com/user-attachments/assets/18e08b2d-4c41-403f-9518-2d7a8a096a95)
+> NAVEGAÇÂO
+. Aqui nós temos um Hidden Drawer para navegar entre as telas principais.
+
+![Captura de tela 2025-02-02 222927](https://github.com/user-attachments/assets/9b34429e-ba73-4bfa-99a5-771d3c643616)
+> TELA LOGIN - Primeira tela que o usuário vai ver se não estiver logado nela nós temos:
+1. A imgem da loja online
+2. Campo para colocar o email
+3. Campo para colocar a senha e no mesmo um iconButton para o usuário ter a opção de visualizar a senha ou não
+4. Um TextButton "Esqueci minha senha" onde ao clicar vem uma tela hipotética de como seria para o usuário recuperar a senha(essa tela em si não faz nenhuma função)
+5. O botão login para validar os campos e acessar a conta
+6. E um texto meramente visual de criar conta.
+
+
+![Captura de tela 2025-02-03 000446 - Copia](https://github.com/user-attachments/assets/e2645c68-4093-4733-9187-72446b7c4a2c)
+> TELA HOME - Essa tela home é um PLUS do que foi pedido no escopo, se basendo na história da Nextar e de desenvolvimento de lojas virtuais essa tela é como se fosse o início de uma loja, uma boa apresentação para o usuário, nela nós temos:
+1. Uma mensagem de bem vindo a sua loja para o usuário
+2. Os campos listas e grades, esses campos servem para o usuário querer mostrar seus produtos principais nessa etapa da visualização nós temos as grades onde o usuário pode vincular um produto e com isso nós clicamos em cima de um item nessas seções e se tiver um produto vinculado nesse item iremos navegar para a tela de detalhes desse produto.
+3. Logo mais abaixo nós temos um FloatingactionButton que ao clicar nele entramos no modo edição da home.
+
+![Captura de tela 2025-02-03 000608](https://github.com/user-attachments/assets/f2a04835-392a-430a-977a-2edaac9c829f)
+> TELA HOME MODO EDIÇÂO - Aqui é o modo de edição da tela home, nela, nós podemos: 
+1. Remover a seção inteira clicando no ícone da lixeira
+2. Editar o título da seção.
+3. Adicionar uma imagem ao clicar no "+" das seções
+4. Se executarmos o long press em cima da imagem é abeto um pop com as opões da vincular um produto naquele item, desvincular se já tem o produto ou excluir a imagem da lista
+5. Logo abaixo temos o nosso FloatinActionButton ao entrar no modo edição ele fica com aqueles 3 pontinhos, e ao clicar em cima é exibido um menu com duas opções, uma sendo para salvar e a outra para descartar nossas alterações.
+
+![Captura de tela 2025-02-03 011626](https://github.com/user-attachments/assets/a5aeda26-cf49-4dfe-a0d5-f1097cb4b97a)
+> TELA DE PRODUTOS - Tela onde temos nossa listagem de produtos
+1. Temos nosso card de produto com algumas informações
+2. Logo abaixo temos o nosso FloatingActionButton
+3. A tela também contém uma paginação para cerregar a cada 10 seções.
+
+![Captura de tela 2025-02-03 011708](https://github.com/user-attachments/assets/65bc6745-fa52-42ad-b78d-35fcad6de1f6)
+> TELA DE PRODUTOS FUNÇÕES- As funções que temos na nossa tela são: 
+1. Como podemos ver ao segurarmos o card ele é selecionado com a opção de excluirmos o produto (excluir produto direto do card)
+2. Ao clicar no nosso FloatingActionButton ele se expande com as opções de excluir um produto caso ele estiver selecionado, adicionar um produto clicando no + e para abrirmos o pop up dos filtros.
+
+![Captura](https://github.com/user-attachments/assets/2f7ed0df-cb79-4aee-8712-bd21b4f30016)
+> TELA DE DETALHES PRODUTOS:
+1. Na AppBar nós temos o IconButton para editar um pedido. 
+2. Nessa tela nós temos os detalhes do nosso produto, tendo um carrosel de imagens caso o produto tenha mais de uma imagem
+3. E logo abaixo temos todas as informações de um produto.
+
+![Captura de tela 2025-02-03 024007](https://github.com/user-attachments/assets/5af15961-2a8f-4a44-b544-83270585cde1)
+> TELA DE EDIÇÃO PRODUTOS:
+1. Na AppBar nós temos o IconButton para excluir o produto. 
+2. Já nosso carrosel é mostrado as imagens com um Icon de lixeira ao lado que da a opçao de excluir a imagem e ao rolar o carrosel até o final é nos mostrado uma camera com um símbolo de "+" para clicarmos e adicionarmos uma foto. 
+3. E logo abaixo temos todas as informações de um produto que pdemos editar.
+
+![Captura de tela 2025-02-03 024046](https://github.com/user-attachments/assets/b6eff1b1-df6f-4a88-ba7c-560d861b79c0)
+> TELA DE CLIENTES:
+1. Essa tela foi um plus que adicionei para mostrar conhecimento sobre o pacote faker para testarmos dados e como o pedido é para fazer um cadastero de produtos como se fosse uma loja eu simulei os clientes que o usuário possa ter na loja dele.
+
+![Captura de tela 2025-02-03 024128](https://github.com/user-attachments/assets/c2bf6ca1-6cef-4e82-bd34-b45975186c52)
+> TELA MINHA CONTA:
+1. Essa tela foi um plus que adicionei onde o usuário possa visualizar ou alterar seus dados, como nome, email e senha
+2. A tela tem a opção também de sair da conta para voltarmos a tela de login.
+3. OBS: Nessa tela a alteração de dados é ilustrativo ela não altera os dados realmente
+
 
 ### 📌 Dependências do Projeto
 
@@ -90,7 +156,7 @@ Agradecemos às seguintes pessoas que contribuíram para este projeto:
 <table>
   <tr>
     <td align="center">
-      <a href="#" title="defina o título do link">
+      <a href="https://www.linkedin.com/in/natanloss/" title="defina o título do link">
         <img src="https://avatars3.githubusercontent.com/u/31936044" width="100px;" alt="Foto do Iuri Silva no GitHub"/><br>
         <sub>
           <b>Natan Peliciolli Loss</b>
