@@ -49,6 +49,12 @@ flutter run --release
 
 ## 🧠​ Sobre o projeto
 
+- Para fazer login e acessar a home:
+```
+user@gmail.com
+123456
+```
+
 ### 📌 Dependências do Projeto
 
 | **Dependência** | **Descrição** |
