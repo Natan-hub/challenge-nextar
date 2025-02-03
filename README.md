@@ -1,7 +1,7 @@
 # CHALLANGE NEXTAR
 Este repositório contém um projeto desenvolvido utilizando Flutter e Firebase. Neste arquivo README, você encontrará um guia passo a passo para abrir o projeto em seu ambiente local.
 
-<img src="imagem.png" alt="Exemplo imagem">
+https://github.com/user-attachments/assets/6acc8165-0f0d-49cf-a1f3-3a12013a6bba
 
 > Esse projeto consiste em uma representação de um app de cadastro de produtos, eu fui um pouco além e deixei parecido com uma loja virtual mas sempre mantendo o cadastro de produtos como parte principal.
 
