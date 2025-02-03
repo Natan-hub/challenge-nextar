@@ -16,6 +16,19 @@ https://github.com/user-attachments/assets/6acc8165-0f0d-49cf-a1f3-3a12013a6bba
 - [] Testes Automatizados
   > Exemplo: 
 ![image](https://github.com/user-attachments/assets/c42eccef-9a5a-4619-8299-26b150ee7658)
+- [] Mudança do gerenciamento de estado de um Provider para Cubit ou Bloc
+  > 1. Exemplo:
+  > 2.![image](https://github.com/user-attachments/assets/6619899e-e64b-46d4-84f4-c9adb70f9dbc)
+  > 3. Aqui é uma classe que estende Cubit<List<ArtigosModel>>, ou seja, esse Cubit gerencia um estado que é uma lista busca artigos na API com base em um termo de pesquisa (buscarArtigo) e, ao receber os dados, atualiza o estado com emit(artigos), notificando a interface para exibir os novos artigos.
+  > 4. emit([...]) → Atualiza o estado do Cubit com os novos detalhes do chamado.
+  > 5. A partir disso nós conseguimos usar o Bloc:
+  >  ![image](https://github.com/user-attachments/assets/5117655c-13b7-417a-ab05-43b1b5a4061c)
+  > 6. Esse código usa BlocBuilder, um widget do flutter_bloc que reconstrói a interface sempre que o estado do Cubit mudar.
+  > 7. O BlocBuilder reconstrói a interface automaticamente sempre que o estado do Cubit muda. Isso elimina a necessidade de setState() e evita reconstruções desnecessárias.
+
+
+
+
 
 ## 💻 Pré-requisitos
 
