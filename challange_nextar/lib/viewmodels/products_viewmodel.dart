@@ -41,7 +41,18 @@ class ProductViewModel extends ChangeNotifier {
 
     try {
       await _productService.saveProduct(product, isEditing);
-      await loadInitialProducts();
+
+      // 🔥 Verifica se está editando ou adicionando e atualiza corretamente
+      if (isEditing) {
+        int index = _products.indexWhere((p) => p.id == product.id);
+        if (index != -1) {
+          _products[index] = product;
+        }
+      } else {
+        _products.add(product);
+      }
+
+      notifyListeners(); // 🔥 Atualiza a UI após salvar
     } catch (e) {
       debugPrint("Erro ao salvar produto: $e");
     } finally {
@@ -60,7 +71,10 @@ class ProductViewModel extends ChangeNotifier {
 
     try {
       await _productService.deleteProduct(product);
-      await loadInitialProducts(); // 🔹 Recarrega a lista para garantir que o produto sumiu
+
+      _products.removeWhere(
+          (p) => p.id == product.id); // 🔥 Remove da lista diretamente
+      notifyListeners(); // 🔥 Atualiza UI
     } catch (e) {
       debugPrint("Erro ao deletar produto: $e");
     } finally {

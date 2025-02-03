@@ -109,6 +109,8 @@ class EditProductView extends StatelessWidget with ValidacoesMixin {
                               if (success) {
                                 Navigator.pop(context);
 
+                                Navigator.pop(context);
+
                                 FlushBarWidget.mostrar(
                                   context,
                                   'Produto salvo com sucesso!',
