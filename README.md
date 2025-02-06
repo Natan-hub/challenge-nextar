@@ -25,10 +25,9 @@ https://github.com/user-attachments/assets/6acc8165-0f0d-49cf-a1f3-3a12013a6bba
   >  ![image](https://github.com/user-attachments/assets/5117655c-13b7-417a-ab05-43b1b5a4061c)
   > 6. Esse código usa BlocBuilder, um widget do flutter_bloc que reconstrói a interface sempre que o estado do Cubit mudar.
   > 7. O BlocBuilder reconstrói a interface automaticamente sempre que o estado do Cubit muda. Isso elimina a necessidade de setState() e evita reconstruções desnecessárias.
-
-
-
-
+- [] Quesitos de acessibilidade
+  > 1. Pensando em deixar o aplicativo acessível para todos nós podemos adicionar um AutoSizeText nos textos para que se o usuário precisasse aumentar a fonta das letras o layou se ajustaria automáticamente.
+  > 2. Poderíamos se basear em alternancia de cores entre modo escuro e claro e com isso adicionar opção para daltonismo no app fazendo essa mudança de cores.
 
 ## 💻 Pré-requisitos
 
